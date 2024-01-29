@@ -1,12 +1,12 @@
 package learnaut;
 
-import java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-
 import de.learnlib.algorithm.PassiveLearningAlgorithm.PassiveDFALearner;
 import de.learnlib.algorithm.rpni.BlueFringeRPNIDFA;
-import net.automatalib.alphabet.Alphabet;
 import net.automatalib.alphabet.*;
 import net.automatalib.automaton.fsa.DFA;
 import net.automatalib.visualization.Visualization;
@@ -18,53 +18,14 @@ public class App
     private App() {
         // prevent instantiation
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         // define the alphabet
         final Alphabet<Character> alphabet = Alphabets.characters('a', 'b');
 
-        // if no training samples have been provided, only the empty automaton can be constructed
-        // final DFA<?, Character> emptyModel = computeModel(alphabet, Collections.emptyList(), Collections.emptyList());
-        // Visualization.visualize(emptyModel, alphabet);
-
-        // since RPNI is a greedy state-merging algorithm, providing only positive examples results in the trivial
-        // one-state acceptor, because there exist no negative "counterexamples" that prevent state merges when
-        // generalizing the initial prefix tree acceptor
-        // final DFA<?, Character> firstModel =
-        //         computeModel(alphabet, getPositiveTrainingSamples(), Collections.emptyList());
-        // Visualization.visualize(firstModel, alphabet);
-
-        // with negative samples (i.e. words that must not be accepted by the model) we get a more "realistic"
-        // generalization of the given training set
         final DFA<?, Character> secondModel =
-                computeModel(alphabet, getPositiveTrainingSamples(), getNegativeTrainingSamples());
+                computeModel(alphabet, getData().get(0), getData().get(1));
         Visualization.visualize(secondModel, alphabet);
-    }
-
-    /**
-     * Returns the positives samples from the example of chapter 12.4.3 of "Grammatical Inference" by Colin de la
-     * Higuera.
-     *
-     * @return a collection of (positive) training samples
-     */
-    private static Collection<Word<Character>> getPositiveTrainingSamples() {
-        return Arrays.asList(Word.fromString("aaa"),
-                             Word.fromString("aaba"),
-                             Word.fromString("bba"),
-                             Word.fromString("bbaba"));
-    }
-
-    /**
-     * Returns the negative samples from the example of chapter 12.4.3 of "Grammatical Inference" by Colin de la
-     * Higuera.
-     *
-     * @return a collection of (negative) training samples
-     */
-    private static Collection<Word<Character>> getNegativeTrainingSamples() {
-        return Arrays.asList(Word.fromString("a"),
-                             Word.fromString("bb"),
-                             Word.fromString("aab"),
-                             Word.fromString("aba"));
     }
 
     /**
@@ -94,5 +55,40 @@ public class App
         learner.addNegativeSamples(negativeSamples);
 
         return learner.computeModel();
+    }
+
+    public static ArrayList<ArrayList<Word<Character>>> getData() throws IOException{
+       BufferedReader br = new BufferedReader(new FileReader("/home/amadou/Desktop/learnAut/automata/data.txt"));
+       
+       ArrayList<Word<Character>> listPlus = new ArrayList<Word<Character>>();
+       ArrayList<Word<Character>> listMinus = new ArrayList<Word<Character>>();
+
+       ArrayList<ArrayList<Word<Character>>> data = new ArrayList<ArrayList<Word<Character>>>();
+
+       try {
+            String line;
+
+
+            boolean flag = true;
+        
+            while ((line = br.readLine()) != null) {
+                if(line.equals("-")){
+                    flag = false;
+                }
+                else{
+                    if (flag){
+                        listPlus.add(Word.fromString(line));
+                    }
+                    if (!flag){
+                        listMinus.add(Word.fromString(line));
+                    }
+                }
+            }
+        } finally {
+            br.close();
+        }
+        data.add(listPlus);
+        data.add(listMinus);
+        return data;
     }
 }
