@@ -23,9 +23,9 @@ public class App
         // define the alphabet
         final Alphabet<Character> alphabet = Alphabets.characters('a', 'b');
 
-        final DFA<?, Character> secondModel =
+        final DFA<?, Character> model =
                 computeModel(alphabet, getData().get(0), getData().get(1));
-        Visualization.visualize(secondModel, alphabet);
+        Visualization.visualize(model, alphabet);
     }
 
     /**
@@ -58,7 +58,7 @@ public class App
     }
 
     public static ArrayList<ArrayList<Word<Character>>> getData() throws IOException{
-       BufferedReader br = new BufferedReader(new FileReader("/home/amadou/Desktop/learnAut/automata/data.txt"));
+       BufferedReader br = new BufferedReader(new FileReader("/home/amadou/Desktop/learnAut/data.txt"));
        
        ArrayList<Word<Character>> listPlus = new ArrayList<Word<Character>>();
        ArrayList<Word<Character>> listMinus = new ArrayList<Word<Character>>();
@@ -67,8 +67,6 @@ public class App
 
        try {
             String line;
-
-
             boolean flag = true;
         
             while ((line = br.readLine()) != null) {

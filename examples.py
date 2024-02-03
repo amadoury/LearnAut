@@ -23,7 +23,7 @@ if __name__ == '__main__' :
     plus = []
     minus = []
     flag = True
-    with open("/home/amadou/Desktop/learnAut/automata/data.txt") as file :
+    with open("/home/amadou/Desktop/learnAut/data.txt") as file :
         for line in file : 
             if (line.rstrip() == '-') : 
                 flag = False
