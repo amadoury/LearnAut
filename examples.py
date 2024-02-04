@@ -33,5 +33,4 @@ if __name__ == '__main__' :
                 else : 
                     minus.append((tuple(line.rstrip()), flag))
     data = plus + minus
-    print(data)
     rpni_example(data)

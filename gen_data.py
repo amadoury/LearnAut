@@ -45,5 +45,5 @@ def write_to_file(plus, minus):
                 file.write(minus[i]+'\n')
 
 if __name__ == '__main__':
-    p, m = gen_word(1, 20, 100, 100, 5)
+    p, m = gen_word(1, 20, 1000, 1000, 5)
     write_to_file(p, m)

@@ -5,4 +5,4 @@ both:
 java:
 	mvn clean compile exec:java -Dexec.args="data.txt"
 py:
-	python3 example.py
+	python3 examples.py

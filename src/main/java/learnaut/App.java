@@ -20,12 +20,34 @@ public class App
     }
     public static void main(String[] args) throws IOException {
 
-        // define the alphabet
-        final Alphabet<Character> alphabet = Alphabets.characters('a', 'b');
+        //define the alphabet
+
+        ArrayList<Word<Character>> listPlus = getData().get(0);
+        ArrayList<Word<Character>> listMinus = getData().get(1);
+
+        ArrayList<Character> alphabet = new ArrayList<Character>();
+
+        for (int i = 0; i < listPlus.size(); i++){
+            for(int j = 0; j < listPlus.get(i).size(); j++){
+                if (!alphabet.contains(listPlus.get(i).asList().get(j))){
+                    alphabet.add(listPlus.get(i).asList().get(j));
+                }
+            }
+        }
+
+        for (int i = 0; i < listMinus.size(); i++){
+            for(int j = 0; j < listMinus.get(i).size(); j++){
+                if (!alphabet.contains(listMinus.get(i).asList().get(j))){
+                    alphabet.add(listMinus.get(i).asList().get(j));
+                }
+            }
+        }
+
+        final Alphabet<Character> alph = Alphabets.fromList(alphabet);
 
         final DFA<?, Character> model =
-                computeModel(alphabet, getData().get(0), getData().get(1));
-        Visualization.visualize(model, alphabet);
+                computeModel(alph, listPlus, listMinus);
+        Visualization.visualize(model, alph);
     }
 
     /**
