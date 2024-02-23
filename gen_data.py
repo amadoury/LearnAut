@@ -1,6 +1,6 @@
 import random
 
-def gen_word(min_len, max_len, len_plus,len_minus, len_alph):
+def gen_words(min_len, max_len, len_plus,len_minus, len_alph):
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     if (len_alph <= 0 or len_alph > 26):
         raise Exception
@@ -45,5 +45,6 @@ def write_to_file(plus, minus):
                 file.write(minus[i]+'\n')
 
 if __name__ == '__main__':
-    p, m = gen_word(1, 20, 1000, 1000, 5)
+    #min_len, max_len, len_plus,len_minus, len_alph
+    p, m = gen_words(1, 3, 5, 5, 3)
     write_to_file(p, m)

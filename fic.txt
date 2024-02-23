@@ -1,0 +1,13 @@
+digraph g {
+
+	s0 [shape="doublecircle" label="de.learnlib.datastructure.pta.BlueFringePTAState@e3e54ba"];
+	s1 [shape="circle" label="de.learnlib.datastructure.pta.BlueFringePTAState@34e5fb6c"];
+	s0 -> s0 [label="b"];
+	s0 -> s0 [label="c"];
+	s0 -> s1 [label="a"];
+	s1 -> s1 [label="c"];
+
+__start0 [label="" shape="none" width="0" height="0"];
+__start0 -> s0;
+
+}

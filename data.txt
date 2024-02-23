@@ -1,8 +1,7 @@
-aaa
-abab
-abba
-aaa
+bcc
+ccc
+bc
+bbb
 -
-baa
-aab
-
+a
+cac
