@@ -1,4 +1,5 @@
 from aalpy.learning_algs import run_RPNI
+from aalpy.utils import ModelChecking
 from aalpy.utils import FileHandler
 from gen_data import gen_words
 from gen_data import write_to_file
@@ -56,7 +57,11 @@ if __name__ == '__main__' :
     data = load_data_from_file('data.txt')
     #rpni_example(data)
 
-    automata_from_file = FileHandler.load_automaton_from_file('fic.txt',automaton_type='dfa')
-    automata_from_file.visualize()
+    n = 100
+
+    automata_java = FileHandler.load_automaton_from_file('fic.txt',automaton_type='dfa')
+    automata_py = run_RPNI(data, automaton_type='dfa',algorithm='classic')
+
+    ModelChecking.compare_automata(automata_py, automata_java, n)
 
     
