@@ -1,4 +1,5 @@
 from aalpy.learning_algs import run_RPNI
+from aalpy.utils import ModelChecking
 from aalpy.utils import FileHandler
 from gen_data import gen_words
 from gen_data import write_to_file
