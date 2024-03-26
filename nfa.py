@@ -18,7 +18,7 @@ class nfa():
 
     def is_accept(self, s, states = None, tab = set()):
         if s == None:
-            return tab
+            return states
         if states == None:
             tab = self.initial_state.get_transitions_states(s[0])
         else:
@@ -30,13 +30,14 @@ class nfa():
         if len(s) == 1:
             return self.is_accept(None, tab)
         return self.is_accept(s[1:], tab)
+    
 
 s1 = state(1, False)
 s2 = state(2, True)
 s3 = state(3, True)
 
 s1.set_transitions({'a':{s2, s3}})
-
+#print(s1.get_transitions_states('a'))
 a = nfa(s1)
 
 print(a.is_accept('a'))
