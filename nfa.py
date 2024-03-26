@@ -16,7 +16,7 @@ class state:
 class nfa():
     def __init__(self, initial_state):
         self.initial_state = initial_state
-        
+ 
     def is_accept(self, s):
         prev = {self.initial_state}
         states = set()
