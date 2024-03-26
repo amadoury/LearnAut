@@ -27,8 +27,10 @@ def gen_words(min_len, max_len, len_plus,len_minus, len_alph):
         if not (word in minus_word) and not (word in plus_word):
             minus_word.append(word)
 
-    assert(len(minus_word) != 0)
+    #assert(len(minus_word) != 0)
     return plus_word, minus_word
+
+
 
 def write_to_file(plus, minus):
     with open('data.txt', 'w') as file :
@@ -46,5 +48,5 @@ def write_to_file(plus, minus):
 
 if __name__ == '__main__':
     #min_len, max_len, len_plus,len_minus, len_alph
-    p, m = gen_words(1, 3, 5, 5, 3)
+    p, m = gen_words(1, 5, 1000, 1000, 3)
     write_to_file(p, m)
