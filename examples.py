@@ -26,8 +26,7 @@ def load_data_from_file(file):
                     plus.append((tuple(line.rstrip()), flag))
                 else : 
                     minus.append((tuple(line.rstrip()), flag))
-    data = plus + minus
-    return data
+    return plus, minus
 
 def multiple_test(start, end, step):
     list_time = []
@@ -53,10 +52,11 @@ data1 = [
     (('b'), False)]
 
 if __name__ == '__main__' :
-    data = load_data_from_file('data.txt')
-    #rpni_example(data)
+    p, m = load_data_from_file('data.txt')
+    data = p + m
+    rpni_example(data)
 
-    automata_from_file = FileHandler.load_automaton_from_file('fic.txt',automaton_type='dfa')
-    automata_from_file.visualize()
+    # automata_from_file = FileHandler.load_automaton_from_file('fic.txt',automaton_type='dfa')
+    # automata_from_file.visualize()
 
     
