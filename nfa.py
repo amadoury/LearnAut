@@ -23,11 +23,14 @@ class nfa():
                     return True
             return False
         if states == None:
+            if(self.initial_state.get_transitions_states(s[0]) == None):
+                return False
             tab = self.initial_state.get_transitions_states(s[0])
         else:
             for st in states:
-                for state in st.get_transitions_states(s[0]):
-                    tab.add(state)
+                if(self.initial_state.get_transitions_states(s[0]) != None):
+                    for state in st.get_transitions_states(s[0]):
+                        tab.add(state)
         if tab == None:
             return False
         if len(s) == 1:
@@ -42,6 +45,6 @@ s1.set_transitions({'a':{s2, s3}})
 
 a = nfa(s1)
 
-states = a.is_accept('a')
+states = a.is_accept('aba')
 print(states)
 
