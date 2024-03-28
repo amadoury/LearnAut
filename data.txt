@@ -1,7 +1,5 @@
-bcc
-ccc
 bc
-bbb
+ccc
 -
-a
-cac
+d
+cdc
