@@ -15,8 +15,14 @@ class state:
         self.accepting = is_accepting
         self.transition = {}
 
+    def __str__(self):
+        return str(self.state_id)
+
     def set_transitions(self, t):
         self.transition = t
+    
+    def add_transition(self, t):
+        self.transition.update(t)
 
     def get_transitions_states(self, c):
         for a,b in self.transition.items():
@@ -47,7 +53,7 @@ class nfa():
             if st.accepting == True:
                 return True
         return False
-    
+     
     def partition(self):
         nb_part = random.randint(2, len(self.list_states))
         # l = []
@@ -59,7 +65,62 @@ class nfa():
 
 
 
-s1 = state(1, False)
+
+def MCA(positif_words):
+    n = 0
+    state_initial = state(n, False)
+    n += 1
+    tab = []
+
+    for word in positif_words:
+        acc = False
+        if(len(word) == 1):
+            state_initial_word = state(n, True)
+            n += 1
+            
+            s = state_initial.get_transitions_states(word[0])
+            if(s == None):
+                state_initial.add_transition({word[0] : {state_initial_word}})
+            else:
+                s.add(state_initial_word)
+
+            continue
+
+        state_initial_word = state(n, False)
+        n += 1
+        st = state_initial_word
+
+        for c in word[1:len(word)-1]:
+            st_next = state(n, False)
+            n += 1
+            st.set_transitions({c : {st_next}})
+            st = st_next
+
+        st_next = state(n, True)
+        n += 1
+        st.set_transitions({word[-1] : {st_next}})
+        
+        s = state_initial.get_transitions_states(word[0])
+        if(s == None):
+            state_initial.add_transition({word[0] : {state_initial_word}})
+        else:
+            s.add(state_initial_word)
+    return nfa(state_initial)
+
+def print_auto_state(state, space = ""):
+    print(space,end="")
+    for a,b in state.transition.items():
+        for s in b:
+            print(a,s,end="\n")
+            print_auto_state(s, space + "   ")
+    print("")
+
+def print_auto(automata):
+    print(automata.initial_state)
+    print_auto_state(automata.initial_state)
+
+
+ s1 = state(1, False)
 s2 = state(2, False)
 s3 = state(3, False)
 s4 = state(4, False)
@@ -69,9 +130,21 @@ s2.set_transitions({'a':{s3}, 'b':{s3}})
 s3.set_transitions({'a':{s4}, 'b':{s4}})
 s4.set_transitions({'a':{s5}, 'b':{s5}})
 
+ 
+auto = MCA(["aab", "ba", "aaa", "b"])
 
-a = nfa(s1, [s1, s2, s3, s4, s5])
-print(list(a.partition()))
+print_auto(auto)
+
+ states = auto.is_accept('aab')
+print(states)
+states = auto.is_accept('aaa')
+print(states)
+states = auto.is_accept('ba')
+print(states)
+states = auto.is_accept('b')
+print(states)
+states = auto.is_accept('a')
+print(states)
 
 # states = a.is_accept('abbbb')
 # print(states)
