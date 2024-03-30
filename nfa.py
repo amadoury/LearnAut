@@ -95,6 +95,7 @@ def print_auto(automata):
     print_auto_state(automata.initial_state)
 
 
+
 s1 = state(1, False)
 s2 = state(2, False)
 s3 = state(3, False)
