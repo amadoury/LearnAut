@@ -54,16 +54,6 @@ class nfa():
                 return True
         return False
      
-    def partition(self):
-        nb_part = random.randint(2, len(self.list_states))
-        # l = []
-        # for i in range(0, len(self.list_states) // nb_part):
-        #     l.append(self.list_states[i :: nb_part])
-
-        # return l
-        return batched_docs(self.list_states, nb_part)
-
-
 
 
 def MCA(positif_words):
@@ -105,7 +95,7 @@ def MCA(positif_words):
             state_initial.add_transition({word[0] : {state_initial_word}})
         else:
             s.add(state_initial_word)
-    return nfa(state_initial)
+    return nfa(state_initial, None)
 
 def print_auto_state(state, space = ""):
     print(space,end="")
@@ -120,7 +110,40 @@ def print_auto(automata):
     print_auto_state(automata.initial_state)
 
 
- s1 = state(1, False)
+
+def partition(lst, min_size=1, max_size=None):
+    if max_size is None:
+        max_size = len(lst)
+    
+    partitions = []
+    
+    while lst:
+        size = random.randint(min_size, min(max_size, len(lst)))
+        partition = random.sample(lst, size)
+        partitions.append(partition)
+        lst = [x for x in lst if x not in partition]
+    
+    return partitions
+
+def string_from_partition(partition):
+    tab =  []
+    for m, part in enumerate(partition):
+        for i in part:
+            tab.append((m + 1, i))
+    tab = sorted(tab, key=lambda x: x[1])
+    s = ""
+    for m, i in tab:
+        s += str(m)
+    return s
+
+def mutation():
+    pass
+
+def crossover():
+    pass
+
+
+s1 = state(1, False)
 s2 = state(2, False)
 s3 = state(3, False)
 s4 = state(4, False)
@@ -133,19 +156,21 @@ s4.set_transitions({'a':{s5}, 'b':{s5}})
  
 auto = MCA(["aab", "ba", "aaa", "b"])
 
-print_auto(auto)
+# print_auto(auto)
 
- states = auto.is_accept('aab')
-print(states)
-states = auto.is_accept('aaa')
-print(states)
-states = auto.is_accept('ba')
-print(states)
-states = auto.is_accept('b')
-print(states)
-states = auto.is_accept('a')
-print(states)
+# states = auto.is_accept('aab')
+# print(states)
+# states = auto.is_accept('aaa')
+# print(states)
+# states = auto.is_accept('ba')
+# print(states)
+# states = auto.is_accept('b')
+# print(states)
+# states = auto.is_accept('a')
+# print(states)
 
 # states = a.is_accept('abbbb')
 # print(states)
 
+
+print(string_from_partition([[1, 2, 6], [3, 7, 9, 10], [4, 8, 12], [5], [11]]))
