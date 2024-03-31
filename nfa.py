@@ -29,13 +29,10 @@ class state:
             if a == c :
                 return b
         return None
-    def __str__(self):
-        return str(self.state_id)
 
 class nfa():
-    def __init__(self, initial_state, list_states):
+    def __init__(self, initial_state):
         self.initial_state = initial_state
-        self.list_states = list_states
  
     def is_accept(self, s):
         prev = {self.initial_state}
@@ -53,7 +50,6 @@ class nfa():
             if st.accepting == True:
                 return True
         return False
-     
 
 
 def MCA(positif_words):
@@ -95,7 +91,7 @@ def MCA(positif_words):
             state_initial.add_transition({word[0] : {state_initial_word}})
         else:
             s.add(state_initial_word)
-    return nfa(state_initial, None)
+    return nfa(state_initial)
 
 def print_auto_state(state, space = ""):
     print(space,end="")
@@ -111,8 +107,6 @@ def print_auto(automata):
 
 
 
-<<<<<<< HEAD
-=======
 def partition(lst, min_size=1, max_size=None):
     if max_size is None:
         max_size = len(lst)
@@ -138,42 +132,58 @@ def string_from_partition(partition):
         s += str(m)
     return s
 
-def mutation():
-    pass
+def mutation(partition):
+    place = random.randint(0, len(partition))
+    partition[place] = random.randint(0, len(partition))
 
-def crossover():
-    pass
+    return partition
+
+def crossover(partition_1, partition_2):
+    len_1 = len(partition_1)
+    len_2 = len(partition_2)
+
+    return (partition_1[:len_1 // 2] + partition_2[len_2 // 2:]
+            , partition_2[:len_2 // 2] + partition_1[len_1 // 2:])
 
 
->>>>>>> 3eca0e19861359e55b909cbb435c15012f0116cf
 s1 = state(1, False)
 s2 = state(2, False)
 s3 = state(3, False)
 s4 = state(4, False)
 s5 = state(5, True)
+
 s1.set_transitions({'a':{s1, s2}, 'b':{s1}})
 s2.set_transitions({'a':{s3}, 'b':{s3}})
 s3.set_transitions({'a':{s4}, 'b':{s4}})
 s4.set_transitions({'a':{s5}, 'b':{s5}})
 
- 
+a = nfa(s1)
+
 auto = MCA(["aab", "ba", "aaa", "b"])
 
-# print_auto(auto)
+print_auto(auto)
 
-# states = auto.is_accept('aab')
-# print(states)
-# states = auto.is_accept('aaa')
-# print(states)
-# states = auto.is_accept('ba')
-# print(states)
-# states = auto.is_accept('b')
-# print(states)
-# states = auto.is_accept('a')
-# print(states)
+states = auto.is_accept('aab')
+print(states)
+states = auto.is_accept('aaa')
+print(states)
+states = auto.is_accept('ba')
+print(states)
+states = auto.is_accept('b')
+print(states)
+states = auto.is_accept('a')
+print(states)
 
 # states = a.is_accept('abbbb')
 # print(states)
 
 
-print(string_from_partition([[1, 2, 6], [3, 7, 9, 10], [4, 8, 12], [5], [11]]))
+p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
+p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
+
+print(p1,p2)
+p1,p2 = crossover(p1,p2)
+print(p1,p2)
+
+p1 = mutation(p1)
+print(p1)
