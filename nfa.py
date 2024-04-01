@@ -30,6 +30,9 @@ class state:
                 return b
         return None
 
+    def set_accepting(self, is_accepting):
+        self.accepting = is_accepting
+
 class nfa():
     def __init__(self, initial_state):
         self.initial_state = initial_state
@@ -57,11 +60,13 @@ def MCA(positif_words):
     state_initial = state(n, False)
     n += 1
     tab = []
+    all_states = []
 
     for word in positif_words:
         acc = False
         if(len(word) == 1):
             state_initial_word = state(n, True)
+            all_states.append(state_initial_word)
             n += 1
             
             s = state_initial.get_transitions_states(word[0])
@@ -73,16 +78,19 @@ def MCA(positif_words):
             continue
 
         state_initial_word = state(n, False)
+        all_states.append(state_initial_word)
         n += 1
         st = state_initial_word
 
         for c in word[1:len(word)-1]:
             st_next = state(n, False)
+            all_states.append(st_next)
             n += 1
             st.set_transitions({c : {st_next}})
             st = st_next
 
         st_next = state(n, True)
+        all_states.append(st_next)
         n += 1
         st.set_transitions({word[-1] : {st_next}})
         
@@ -91,7 +99,7 @@ def MCA(positif_words):
             state_initial.add_transition({word[0] : {state_initial_word}})
         else:
             s.add(state_initial_word)
-    return nfa(state_initial)
+    return nfa(state_initial),all_states
 
 def print_auto_state(state, space = ""):
     print(space,end="")
@@ -134,8 +142,10 @@ def string_from_partition(partition):
 
 def mutation(partition):
     place = random.randint(0, len(partition))
-    partition[place] = random.randint(0, len(partition))
-
+    mu = random.randint(0, len(partition))
+    partition = partition[:place] + str(mu) + partition[place+1:]
+    
+    # print("mu",mu)
     return partition
 
 def crossover(partition_1, partition_2):
@@ -145,6 +155,55 @@ def crossover(partition_1, partition_2):
     return (partition_1[:len_1 // 2] + partition_2[len_2 // 2:]
             , partition_2[:len_2 // 2] + partition_1[len_1 // 2:])
 
+def partition_to_automata(partition, all_states):
+    
+    parti = []
+    for i in partition:
+
+        parti.append(int(i))
+    partition = parti
+    n = 0
+    tab = [-1] * len(partition)
+    for i in range(len(partition)):
+
+        if(tab[partition[i]] == -1):
+            tab[partition[i]] = state(n, False)
+            n += 1
+        print(i,tab[partition[i]])
+    
+    for i in range(len(partition)):
+
+        if(tab[partition[i]] == -1):
+            print(i)
+            continue
+        
+        states_merged_transitions = tab[partition[i]].transition.items()
+
+        for a,b in all_states[i].transition.items():
+            already_added_transition = False
+            for c,d in states_merged_transitions:
+                if(a == c):
+                    already_added_transition = True
+                    for st in b:
+                        already_added_state = False
+                        for st_merged in d:
+                            
+                            print(d,"dddzqq",type(st_merged))
+
+                            if(partition[st.state_id] == st_merged.state_id):
+                                already_added_state = True
+                        if(not already_added_state):
+                            d.add(tab[partition[st.state_id]])
+            states_merged_target = set()
+            for st in b:
+
+                print("tab[st.state_id]",tab[st.state_id],"st",st)
+
+                if(tab[st.state_id] not in states_merged_target):
+                    states_merged_target.add(tab[st.state_id])
+            tab[partition[i]].add_transition({a : states_merged_target})
+    
+    return nfa(tab[partition[0]])
 
 s1 = state(1, False)
 s2 = state(2, False)
@@ -159,7 +218,7 @@ s4.set_transitions({'a':{s5}, 'b':{s5}})
 
 a = nfa(s1)
 
-auto = MCA(["aab", "ba", "aaa", "b"])
+auto,auto_states = MCA(["aab", "ba", "aaa", "b"])
 
 print_auto(auto)
 
@@ -187,3 +246,8 @@ print(p1,p2)
 
 p1 = mutation(p1)
 print(p1)
+
+p = string_from_partition([[0, 1, 2, 6, 7], [3, 9], [4, 5, 8]])
+
+automata_merged = partition_to_automata(p, auto_states)
+print_auto(automata_merged)
