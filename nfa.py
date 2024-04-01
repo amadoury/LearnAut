@@ -53,7 +53,7 @@ class nfa():
 
 
 def MCA(positif_words):
-    n = 0
+    n = 1
     state_initial = state(n, False)
     n += 1
     tab = []
@@ -91,7 +91,7 @@ def MCA(positif_words):
             state_initial.add_transition({word[0] : {state_initial_word}})
         else:
             s.add(state_initial_word)
-    return nfa(state_initial)
+    return nfa(state_initial), n
 
 def print_auto_state(state, space = ""):
     print(space,end="")
@@ -145,6 +145,27 @@ def crossover(partition_1, partition_2):
     return (partition_1[:len_1 // 2] + partition_2[len_2 // 2:]
             , partition_2[:len_2 // 2] + partition_1[len_1 // 2:])
 
+def partition_from_string(s):
+    part = []
+    for j, m in enumerate(s) :
+        part.append((j + 1,m))
+    
+    part = sorted(part, key=lambda x: x[1])
+    partition = []
+    i = 0
+    while i < len(part) : 
+        l = [a for (a, b) in part if b == part[i][1]]
+        partition.append(l)
+        i += len(l)
+
+    return partition
+
+
+def nfa_from_partition(partition):
+    pass 
+
+def algo_genetiq(p, m):
+    pass
 
 s1 = state(1, False)
 s2 = state(2, False)
@@ -159,20 +180,21 @@ s4.set_transitions({'a':{s5}, 'b':{s5}})
 
 a = nfa(s1)
 
-auto = MCA(["aab", "ba", "aaa", "b"])
+auto, m = MCA(["aab", "ba", "aaa", "b"])
+print(m)
 
 print_auto(auto)
 
-states = auto.is_accept('aab')
-print(states)
-states = auto.is_accept('aaa')
-print(states)
-states = auto.is_accept('ba')
-print(states)
-states = auto.is_accept('b')
-print(states)
-states = auto.is_accept('a')
-print(states)
+# states = auto.is_accept('aab')
+# print(states)
+# states = auto.is_accept('aaa')
+# print(states)
+# states = auto.is_accept('ba')
+# print(states)
+# states = auto.is_accept('b')
+# print(states)
+# states = auto.is_accept('a')
+# print(states)
 
 # states = a.is_accept('abbbb')
 # print(states)
@@ -181,9 +203,12 @@ print(states)
 p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
 p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
 
-print(p1,p2)
-p1,p2 = crossover(p1,p2)
-print(p1,p2)
+# print(p1,p2)
+# p1,p2 = crossover(p1,p2)
+# print(p1,p2)
 
-p1 = mutation(p1)
-print(p1)
+# p1 = mutation(p1)
+# print(p1)
+
+s = partition_from_string(p1)
+print(s)
