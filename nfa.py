@@ -1,19 +1,11 @@
 import random
-from itertools import islice
 
-def batched_docs(iterable, n):
-    # batched('ABCDEFG', 3) --> ABC DEF G
-    if n < 1:
-        raise ValueError('n must be at least one')
-    it = iter(iterable)
-    while batch := tuple(islice(it, n)):
-        yield batch
-
-class state:
-    def __init__(self, state_id, is_accepting):
+class State:
+    def __init__(self, state_id, is_accepting, initial_state=False):
         self.state_id = state_id
         self.accepting = is_accepting
         self.transition = {}
+        self.initial_state = initial_state
 
     def __str__(self):
         return str(self.state_id)
@@ -32,8 +24,9 @@ class state:
 
     def set_accepting(self, is_accepting):
         self.accepting = is_accepting
+    
 
-class nfa():
+class Nfa():
     def __init__(self, initial_state):
         self.initial_state = initial_state
  
@@ -56,16 +49,16 @@ class nfa():
 
 
 def MCA(positif_words):
-    n = 1
-    state_initial = state(n, False)
+    n = 0
+    state_initial = State(n, False, initial_state=True)
     n += 1
     tab = []
-    all_states = []
+    all_states = [state_initial]
 
     for word in positif_words:
         acc = False
         if(len(word) == 1):
-            state_initial_word = state(n, True)
+            state_initial_word = State(n, True)
             all_states.append(state_initial_word)
             n += 1
             
@@ -77,19 +70,19 @@ def MCA(positif_words):
 
             continue
 
-        state_initial_word = state(n, False)
+        state_initial_word = State(n, False)
         all_states.append(state_initial_word)
         n += 1
         st = state_initial_word
 
         for c in word[1:len(word)-1]:
-            st_next = state(n, False)
+            st_next = State(n, False)
             all_states.append(st_next)
             n += 1
             st.set_transitions({c : {st_next}})
             st = st_next
 
-        st_next = state(n, True)
+        st_next = State(n, True)
         all_states.append(st_next)
         n += 1
         st.set_transitions({word[-1] : {st_next}})
@@ -99,7 +92,7 @@ def MCA(positif_words):
             state_initial.add_transition({word[0] : {state_initial_word}})
         else:
             s.add(state_initial_word)
-     return nfa(state_initial)
+    return Nfa(state_initial),all_states
 
 def print_auto_state(state, space = ""):
     print(space,end="")
@@ -133,7 +126,7 @@ def string_from_partition(partition):
     tab =  []
     for m, part in enumerate(partition):
         for i in part:
-            tab.append((m + 1, i))
+            tab.append((m, i))
     tab = sorted(tab, key=lambda x: x[1])
     s = ""
     for m, i in tab:
@@ -145,7 +138,6 @@ def mutation(partition):
     mu = random.randint(0, len(partition))
     partition = partition[:place] + str(mu) + partition[place+1:]
     
-    # print("mu",mu)
     return partition
 
 def crossover(partition_1, partition_2):
@@ -155,23 +147,209 @@ def crossover(partition_1, partition_2):
     return (partition_1[:len_1 // 2] + partition_2[len_2 // 2:]
             , partition_2[:len_2 // 2] + partition_1[len_1 // 2:])
 
- 
-s1 = state(1, False)
-s2 = state(2, False)
-s3 = state(3, False)
-s4 = state(4, False)
-s5 = state(5, True)
+def partition_from_string(s):
+    part = []
+    for j, m in enumerate(s) :
+        part.append((j,m))
+    
+    part = sorted(part, key=lambda x: x[1])
+    partition = []
+    i = 0
+    while i < len(part) : 
+        l = [a for (a, b) in part if b == part[i][1]]
+        partition.append(l)
+        i += len(l)
 
-s1.set_transitions({'a':{s1, s2}, 'b':{s1}})
-s2.set_transitions({'a':{s3}, 'b':{s3}})
-s3.set_transitions({'a':{s4}, 'b':{s4}})
-s4.set_transitions({'a':{s5}, 'b':{s5}})
+    return partition
 
-a = nfa(s1)
+def part_initial_state(partition):
+    for i, part in enumerate(partition):
+        for state in part : 
+            if state.initial_state :
+                return i
+    return None
 
- auto = MCA(["aab", "ba", "aaa", "b"])
+def part_contains_accepting(part):
+    for state in part :
+        if state.accepting :
+            return True
+    return False
 
-print_auto(auto)
+
+def which_part(state, all):
+    for i,st in enumerate(all) :
+        if state in st.state_id : 
+            return i
+    return None
+
+def nfa_from_partition(partition, all_states):
+    j = part_initial_state(partition)
+    accept = part_contains_accepting(partition[j])
+    initial_state = State(partition[j],accept,initial_state=True)
+
+    all = [initial_state]
+
+    for i, part in enumerate(partition):
+        if i != j :
+            accept = part_contains_accepting(part)
+            all.append(State(part, accept))
+    
+    for state in all_states:
+        for k, v in state.transition.items() : 
+            for st in v :
+                p = which_part(st, all)
+                if p != None : 
+                    q = which_part(state, all)
+                    if q != None:
+                        s = all[q].get_transitions_states(k)
+                        if s != None :
+                            s.add(all[p])
+                        else : 
+                            all[q].add_transition({k:{all[p]}})
+    return Nfa(initial_state)
+
+    
+def fitness_function(nfa, all_states, m):
+    err = 0
+    for s in m : 
+        if not nfa.is_accept(s):
+            err += 1
+    return err + len(all_states)
+
+def number_to_states(partitions, all_states):
+    parti = []
+    for part in partitions:
+        for p in part : 
+            l = []
+            for a in all_states : 
+                if a.state_id == p : 
+                    l.append(a)
+        parti.append(l)
+    return parti
+
+
+def algo_genetiq(p, m):
+    nfa, all_states = MCA(p)
+    min = None
+    f = None
+    f_c = None
+    for _ in range(100):
+        l = list(range(len(all_states)))
+        p1 = partition(l)
+        p2 = partition(l)
+        s1 = string_from_partition(p1)
+        s2 = string_from_partition(p2)
+        s1 = mutation(s1)
+        s2 = mutation(s2)
+        s = crossover(s1, s2)
+        p = partition_from_string(s)
+
+        parti = number_to_states(p, all_states)
+        nfa = nfa_from_partition(parti, all_states)
+
+        f_c = fitness_function(nfa, all_states, m)
+        if f == None : 
+            f = f_c
+            min = nfa
+        elif f_c < f : 
+            f = f_c
+            min = nfa
+    return min
+        
+
+
+
+
+def partition_to_automata(partition, all_states):
+    
+    parti = []
+    for i in partition:
+
+        parti.append(int(i))
+    partition = parti
+    n = 0
+    tab = [-1] * len(partition)
+    for i in range(len(partition)):
+
+        if(tab[partition[i]] == -1):
+            tab[partition[i]] = State(n, False)
+            n += 1
+        print(i,tab[partition[i]])
+    
+    for i in range(len(partition)):
+
+        if(tab[partition[i]] == -1):
+            print(i)
+            continue
+        
+        states_merged_transitions = tab[partition[i]].transition.items()
+
+        for a,b in all_states[i].transition.items():
+            already_added_transition = False
+            for c,d in states_merged_transitions:
+                if(a == c):
+                    already_added_transition = True
+                    for st in b:
+                        already_added_state = False
+                        for st_merged in d:
+                            
+                            print(d,"dddzqq",type(st_merged))
+
+                            if(partition[st.state_id] == st_merged.state_id):
+                                already_added_state = True
+                        if(not already_added_state):
+                            d.add(tab[partition[st.state_id]])
+            states_merged_target = set()
+            for st in b:
+
+                print("tab[st.state_id]",tab[st.state_id],"st",st)
+
+                if(tab[st.state_id] not in states_merged_target):
+                    states_merged_target.add(tab[st.state_id])
+            tab[partition[i]].add_transition({a : states_merged_target})
+    
+    return Nfa(tab[partition[0]])
+
+
+
+a = algo_genetiq(['aa', 'aba'], ['b', 'bba'])
+
+print(a.is_accept('b'))
+
+
+# s1 = State(1, False, initial_state=True)
+# s2 = State(2, False)
+# s3 = State(3, False)
+# s4 = State(4, False)
+# s5 = State(5, True)
+
+# s1.set_transitions({'a':{s1, s2}, 'b':{s1}})
+# s2.set_transitions({'a':{s3}, 'b':{s3}})
+# s3.set_transitions({'a':{s4}, 'b':{s4}})
+# s4.set_transitions({'a':{s5}, 'b':{s5}})
+
+# a = Nfa(s1)
+
+# #print_auto(a)
+
+# auto, auto_states = MCA(["aab", "ba", "aaa", "b"])
+# # print(m)
+
+
+# st1 = State(1, False, initial_state=True)
+# st2 = State(2, False)
+# st3 = State(3, False)
+# st4 = State(4, True)
+
+# st1.set_transitions({'a':{st2}, 'b' : {st4}})
+# st2.set_transitions({'a':{st3}})
+
+# au = Nfa(st1)
+
+# print(au.is_accept("a"))
+
+# aut = nfa_from_partition([[st1, st2], [st3], [st4]], [st1, st2, st3, st4])
+# print_auto(aut)
 
 # states = auto.is_accept('aab')
 # print(states)
@@ -188,12 +366,17 @@ print_auto(auto)
 # print(states)
 
 
-p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
-p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
+# p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
+# p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
 
-# print(p1,p2)
-# p1,p2 = crossover(p1,p2)
-# print(p1,p2)
+# # print(p1,p2)
+# # p1,p2 = crossover(p1,p2)
+# # print(p1,p2)
 
- p1 = mutation(p1)
-print(p1)
+# p1 = mutation(p1)
+# print(p1)
+
+# p = string_from_partition([[0, 1, 2, 6, 7], [3, 9], [4, 5, 8]])
+
+# automata_merged = partition_to_automata(p, auto_states)
+# print_auto(automata_merged)
