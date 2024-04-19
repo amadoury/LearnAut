@@ -136,7 +136,7 @@ def string_from_partition(partition):
 def mutation(partition):
     place = random.randint(0, len(partition))
     mu = random.randint(0, len(partition))
-    partition = partition[:place] + str(mu) + partition[place+1:]
+    partition = str(partition[:place]) + str(mu) + str(partition[place+1:])
     
     return partition
 
@@ -209,7 +209,8 @@ def nfa_from_partition(partition, all_states):
     return Nfa(initial_state)
 
     
-def fitness_function(nfa, all_states, m):
+def fitness_function(p, all_states, m):
+    nfa = nfa_from_partition(p, all_states)
     err = 0
     for s in m : 
         if not nfa.is_accept(s):
@@ -228,155 +229,129 @@ def number_to_states(partitions, all_states):
     return parti
 
 
-def algo_genetiq(p, m):
+def initial_gen(len_gen, list_states, m):
+    l = []
+    for _ in range(len_gen):
+        p = partition(list_states)
+        l.append((p, fitness_function(p, list_states, m)))
+    l = sorted(l, key=lambda x: x[1])
+    return l
+
+
+def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
+    len_mut = (cent_mut * len(prev_gen)) // 100
+    len_copy = (cent_copy * len(prev_gen)) // 100
+    len_cross = ((100 - cent_copy - cent_mut) * len(prev_gen)) // 100
+    
+    #
+    t = sum(n for _, n in prev_gen)
+    a = []
+    for _, j in prev_gen:
+        a.append(1 - j / t)
+
+    #copy
+    l = prev_gen[:len_copy] 
+    
+    #mutation
+    for _ in range(len_mut):
+        [(c, _)] = random.choices(prev_gen, weights=a)
+        p = mutation(c)
+        l.append(p, fitness_function(p, list_states, states_minus))
+
+    #crossover 
+    for _ in range(len_cross):
+        [(c1, _)] = random.choices(prev_gen, weights=a)
+        [(c2, _)] = random.choices(prev_gen, weights=a)
+        p = crossover(c1, c2)
+        l.append(p, fitness_function(p, list_states, states_minus))  
+    return l
+
+def best_avg_fitness(gen):
+    _, best_fitness = gen[0]
+    avg_fitness = sum(n for _, n in gen) / len(gen)
+    return gen, best_fitness, avg_fitness
+
+def algo_genetiq(p, m, taille_gen, nb_gen):
     nfa, all_states = MCA(p)
-    min = None
-    f = None
-    f_c = None
-    for _ in range(100):
-        l = list(range(len(all_states)))
-        p1 = partition(l)
-        p2 = partition(l)
-        s1 = string_from_partition(p1)
-        s2 = string_from_partition(p2)
-        s1 = mutation(s1)
-        s2 = mutation(s2)
-        s = crossover(s1, s2)
-        p = partition_from_string(s)
+    init_gen = initial_gen(taille_gen, all_states, m)
+    all = [best_avg_fitness(init_gen)]
+    prev_gen = init_gen
+    for _ in range(nb_gen):
+        n_gen = next_gen(prev_gen, all_states, m)
+        all.append(best_avg_fitness(next_gen))
+        prev_gen = n_gen
 
-        parti = number_to_states(p, all_states)
-        nfa = nfa_from_partition(parti, all_states)
-
-        f_c = fitness_function(nfa, all_states, m)
-        if f == None : 
-            f = f_c
-            min = nfa
-        elif f_c < f : 
-            f = f_c
-            min = nfa
-    return min
-        
+    all = sorted(all, key=lambda x: x[1])
+    return all
 
 
+if __name__ == '__main__':
+
+    a = algo_genetiq(['aa', 'aba'], ['b', 'bba'], 50, 10)
+
+    print(a.is_accept('b'))
 
 
-def partition_to_automata(partition, all_states):
-    
-    parti = []
-    for i in partition:
+    # s1 = State(1, False, initial_state=True)
+    # s2 = State(2, False)
+    # s3 = State(3, False)
+    # s4 = State(4, False)
+    # s5 = State(5, True)
 
-        parti.append(int(i))
-    partition = parti
-    n = 0
-    tab = [-1] * len(partition)
-    for i in range(len(partition)):
+    # s1.set_transitions({'a':{s1, s2}, 'b':{s1}})
+    # s2.set_transitions({'a':{s3}, 'b':{s3}})
+    # s3.set_transitions({'a':{s4}, 'b':{s4}})
+    # s4.set_transitions({'a':{s5}, 'b':{s5}})
 
-        if(tab[partition[i]] == -1):
-            tab[partition[i]] = State(n, False)
-            n += 1
-        print(i,tab[partition[i]])
-    
-    for i in range(len(partition)):
+    # a = Nfa(s1)
 
-        if(tab[partition[i]] == -1):
-            print(i)
-            continue
-        
-        states_merged_transitions = tab[partition[i]].transition.items()
+    # #print_auto(a)
 
-        for a,b in all_states[i].transition.items():
-            already_added_transition = False
-            for c,d in states_merged_transitions:
-                if(a == c):
-                    already_added_transition = True
-                    for st in b:
-                        already_added_state = False
-                        for st_merged in d:
-                            
-                            print(d,"dddzqq",type(st_merged))
-
-                            if(partition[st.state_id] == st_merged.state_id):
-                                already_added_state = True
-                        if(not already_added_state):
-                            d.add(tab[partition[st.state_id]])
-            states_merged_target = set()
-            for st in b:
-
-                print("tab[st.state_id]",tab[st.state_id],"st",st)
-
-                if(tab[st.state_id] not in states_merged_target):
-                    states_merged_target.add(tab[st.state_id])
-            tab[partition[i]].add_transition({a : states_merged_target})
-    
-    return Nfa(tab[partition[0]])
+    # auto, auto_states = MCA(["aab", "ba", "aaa", "b"])
+    # # print(m)
 
 
+    # st1 = State(1, False, initial_state=True)
+    # st2 = State(2, False)
+    # st3 = State(3, False)
+    # st4 = State(4, True)
 
-a = algo_genetiq(['aa', 'aba'], ['b', 'bba'])
+    # st1.set_transitions({'a':{st2}, 'b' : {st4}})
+    # st2.set_transitions({'a':{st3}})
 
-print(a.is_accept('b'))
+    # au = Nfa(st1)
 
+    # print(au.is_accept("a"))
 
-# s1 = State(1, False, initial_state=True)
-# s2 = State(2, False)
-# s3 = State(3, False)
-# s4 = State(4, False)
-# s5 = State(5, True)
+    # aut = nfa_from_partition([[st1, st2], [st3], [st4]], [st1, st2, st3, st4])
+    # print_auto(aut)
 
-# s1.set_transitions({'a':{s1, s2}, 'b':{s1}})
-# s2.set_transitions({'a':{s3}, 'b':{s3}})
-# s3.set_transitions({'a':{s4}, 'b':{s4}})
-# s4.set_transitions({'a':{s5}, 'b':{s5}})
+    # states = auto.is_accept('aab')
+    # print(states)
+    # states = auto.is_accept('aaa')
+    # print(states)
+    # states = auto.is_accept('ba')
+    # print(states)
+    # states = auto.is_accept('b')
+    # print(states)
+    # states = auto.is_accept('a')
+    # print(states)
 
-# a = Nfa(s1)
-
-# #print_auto(a)
-
-# auto, auto_states = MCA(["aab", "ba", "aaa", "b"])
-# # print(m)
-
-
-# st1 = State(1, False, initial_state=True)
-# st2 = State(2, False)
-# st3 = State(3, False)
-# st4 = State(4, True)
-
-# st1.set_transitions({'a':{st2}, 'b' : {st4}})
-# st2.set_transitions({'a':{st3}})
-
-# au = Nfa(st1)
-
-# print(au.is_accept("a"))
-
-# aut = nfa_from_partition([[st1, st2], [st3], [st4]], [st1, st2, st3, st4])
-# print_auto(aut)
-
-# states = auto.is_accept('aab')
-# print(states)
-# states = auto.is_accept('aaa')
-# print(states)
-# states = auto.is_accept('ba')
-# print(states)
-# states = auto.is_accept('b')
-# print(states)
-# states = auto.is_accept('a')
-# print(states)
-
-# states = a.is_accept('abbbb')
-# print(states)
+    # states = a.is_accept('abbbb')
+    # print(states)
 
 
-# p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
-# p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
+    # p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
+    # p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
 
-# # print(p1,p2)
-# # p1,p2 = crossover(p1,p2)
-# # print(p1,p2)
+    # # print(p1,p2)
+    # # p1,p2 = crossover(p1,p2)
+    # # print(p1,p2)
 
-# p1 = mutation(p1)
-# print(p1)
+    # p1 = mutation(p1)
+    # print(p1)
 
-# p = string_from_partition([[0, 1, 2, 6, 7], [3, 9], [4, 5, 8]])
+    # p = string_from_partition([[0, 1, 2, 6, 7], [3, 9], [4, 5, 8]])
 
-# automata_merged = partition_to_automata(p, auto_states)
-# print_auto(automata_merged)
+    # automata_merged = partition_to_automata(p, auto_states)
+    # print_auto(automata_merged)
