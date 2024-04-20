@@ -6,6 +6,7 @@ from examples import load_data_from_file
 from aalpy.utils.ModelChecking import compare_automata
 from aalpy.utils.ModelChecking import bisimilar
 import matplotlib.pyplot as plt
+import nfa
 
 
 def to_tuple_list(l, label):
@@ -126,6 +127,7 @@ def compare_RPNI_NFA(taille, np, nm, states):
     n = 0
     l = p1 + m1
 
+    nfa = 
     
     for w in l : 
         try : 

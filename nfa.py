@@ -299,7 +299,7 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
     all = [best_avg_fitness(init_gen)]
     prev_gen = init_gen
     for _ in range(nb_gen):
-        n_gen = next_gen(prev_gen, all_states, m, p, cent_copy=0)
+        n_gen = next_gen(prev_gen, all_states, m, p)
         all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
@@ -311,11 +311,25 @@ if __name__ == '__main__':
 
     a = algo_genetiq(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a'], 50, 10)
 
-    _, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
+    n, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
     # print(mca.is_accept('b'))
     # print(mca.is_accept('aba'))
 
     # print(a[len(a)-1][1])
+
+    # print(n.is_accept('b'))
+    # print(n.is_accept('bba'))
+    # print(n.is_accept('cc'))
+    # print(n.is_accept('a'))
+
+    # print(n.is_accept('aa'))
+    # print(n.is_accept('aba'))
+    # print(n.is_accept('bbbb'))
+    # print(n.is_accept('ca'))
+    # print(n.is_accept('cccb'))
+
+
+    print("-----------------------------------")
 
     p = partition_from_string(a[len(a)-1][0][0][0])
 
