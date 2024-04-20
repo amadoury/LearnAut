@@ -128,16 +128,15 @@ def string_from_partition(partition):
         for i in part:
             tab.append((m, i))
     tab = sorted(tab, key=lambda x: x[1])
-    s = ""
+    s = []
     for m, i in tab:
-        s += str(m)
+        s.append(m)
     return s
 
 def mutation(partition):
     place = random.randint(0, len(partition) - 1)
     mu = random.randint(0, len(partition) - 1)
-    partition = str(partition[:place]) + str(mu) + str(partition[place+1:])
-    print("fin",partition)
+    partition = partition[:place] + [mu] + partition[place+1:]
     return partition
 
 def crossover(partition_1, partition_2):
@@ -210,7 +209,8 @@ def nfa_from_partition(partition, all_states):
 
 def number_to_states(partitions, all_states):
     l = []
-
+    print(partitions , "partitions")
+    print(len(all_states), "len all_states")
     for p in partitions:
         m = []
         for s in p:
@@ -307,11 +307,11 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
 
 if __name__ == '__main__':
 
-    a = algo_genetiq(['aa', 'aba'], ['b', 'bba'], 50, 10)
+    a = algo_genetiq(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a'], 50, 10)
 
-    mca,all_states = MCA(['aa', 'aba'])
-    print(mca.is_accept('b'))
-    print(mca.is_accept('aba'))
+    mca,all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
+    # print(mca.is_accept('b'))
+    # print(mca.is_accept('aba'))
 
     # print(a[len(a)-1][1])
     print(a[len(a)-1])
@@ -328,8 +328,14 @@ if __name__ == '__main__':
 
     print(n.is_accept('b'))
     print(n.is_accept('bba'))
+    print(n.is_accept('cc'))
+    print(n.is_accept('a'))
+
     print(n.is_accept('aa'))
     print(n.is_accept('aba'))
+    print(n.is_accept('bbbb'))
+    print(n.is_accept('ca'))
+    print(n.is_accept('cccb'))
 
 
     # s1 = State(1, False, initial_state=True)
