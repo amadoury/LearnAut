@@ -134,10 +134,11 @@ def string_from_partition(partition):
     return s
 
 def mutation(partition):
-    place = random.randint(0, len(partition))
-    mu = random.randint(0, len(partition))
+    print("debut", partition)
+    place = random.randint(0, len(partition) - 1)
+    mu = random.randint(0, len(partition) - 1)
     partition = str(partition[:place]) + str(mu) + str(partition[place+1:])
-    
+    print("fin",partition)
     return partition
 
 def crossover(partition_1, partition_2):
@@ -159,7 +160,6 @@ def partition_from_string(s):
         l = [a for (a, b) in part if b == part[i][1]]
         partition.append(l)
         i += len(l)
-
     return partition
 
 def part_initial_state(partition):
@@ -217,14 +217,11 @@ def number_to_states(partitions, all_states):
     for p in partitions:
         m = []
         for s in p:
-            print("val", s)
-            for z in all_states:
-                print("id", z.state_id)
-            [v] = [a for a in all_states if a.state_id == s]
+            #[v] = [a for a in all_states if a.state_id == s]
 
-            # it = filter(lambda x: (x.state_id == s) ,all_states)
+            it = filter(lambda x: (x.state_id == s) ,all_states)
             # if len(list(it)) == 1:
-            #     [v] = list(it)
+            [v] = list(it)
             m.append(v)
         l.append(m)
     return l
@@ -298,7 +295,7 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
     prev_gen = init_gen
     for _ in range(nb_gen):
         n_gen = next_gen(prev_gen, all_states, m)
-        all.append(best_avg_fitness(next_gen))
+        all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
     all = sorted(all, key=lambda x: x[1])
