@@ -223,29 +223,34 @@ def number_to_states(partitions, all_states):
         l.append(m)
     return l
 
-def fitness_function(p, all_states, m):
+def fitness_function(p, all_states, m, plus):
 
     p = partition_from_string(p)
     ps = number_to_states(p, all_states)
     nfa = nfa_from_partition(ps, all_states)
 
     err = 0
-    for s in m : 
+
+    for s in plus : 
         if not nfa.is_accept(s):
+            err += 1
+
+    for s in m : 
+        if nfa.is_accept(s):
             err += 1
     return err + len(all_states)
 
 
-def initial_gen(len_gen, list_states, m):
+def initial_gen(len_gen, list_states, m, plus):
     l = []
     for _ in range(len_gen):
         p = partition(list(range(len(list_states))))
         st = string_from_partition(p)
-        l.append((st, fitness_function(st, list_states, m)))
+        l.append((st, fitness_function(st, list_states, m, plus)))
     l = sorted(l, key=lambda x: x[1])
     return l
 
-def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
+def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent_copy=5):
     len_mut = (cent_mut * len(prev_gen)) // 100
     len_copy = (cent_copy * len(prev_gen)) // 100
     len_cross = ((100 - cent_copy - cent_mut) * len(prev_gen)) // 100
@@ -268,7 +273,7 @@ def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
     for _ in range(len_mut):
         [(c, _)] = random.choices(prev_gen, weights=a)
         p = mutation(c)
-        l.append((p, fitness_function(p, list_states, states_minus)))
+        l.append((p, fitness_function(p, list_states, states_minus, states_plus)))
 
     #crossover 
     for _ in range(len_cross):
@@ -276,8 +281,8 @@ def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
         [(c1, _)] = random.choices(prev_gen, weights=a)
         [(c2, _)] = random.choices(prev_gen, weights=a)
         b,c = crossover(c1, c2)
-        l.append((b, fitness_function(b, list_states, states_minus))) 
-        l.append((c, fitness_function(c, list_states, states_minus)))
+        l.append((b, fitness_function(b, list_states, states_minus, states_plus))) 
+        l.append((c, fitness_function(c, list_states, states_minus, states_plus)))
     return l
 
 def best_avg_fitness(g):
@@ -288,11 +293,11 @@ def best_avg_fitness(g):
 def algo_genetiq(p, m, taille_gen, nb_gen):
     nfa, all_states = MCA(p)
 
-    init_gen = initial_gen(taille_gen, all_states, m)
+    init_gen = initial_gen(taille_gen, all_states, m, p)
     all = [best_avg_fitness(init_gen)]
     prev_gen = init_gen
     for _ in range(nb_gen):
-        n_gen = next_gen(prev_gen, all_states, m)
+        n_gen = next_gen(prev_gen, all_states, m, p)
         all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
