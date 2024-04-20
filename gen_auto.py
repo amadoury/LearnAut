@@ -105,6 +105,38 @@ def compare_aalpy_with_random(taille, np, nm, nstate):
 #    print("Taux d'error du rpni ", n / len(l))
     return n / len(l)
 
+def compare_RPNI_NFA(taille, np, nm, states):
+     model_rpni = run_RPNI(p, automaton_type='dfa', print_info=False)
+    
+    # on teste la qualité de l'automate model_rpni
+    # pour cela on génére un seconde échantillon 
+    p, m = gen_words(1,5, np, nm, len(alpha))
+    p1 = []
+    m1 = []
+    for w in p :
+        try:
+            res = random_dfa.compute_output_seq(model_rpni.initial_state, w)
+            if res[-1] : 
+                p1.append(w)
+            else:
+                m1.append(w)
+        except:
+            continue
+         
+    n = 0
+    l = p1 + m1
+
+    
+    for w in l : 
+        try : 
+            res1 = nfa.is_accept(w) 
+            res2 = model_rpni.compute_output_seq(model_rpni.initial_state, w)
+
+            if ((not res1[-1]) and res2[-1]) or (res1[-1] and (not res2[-1])):
+                n += 1
+        except Exception:
+            continue
+
 
 if __name__ == '__main__':
     somme = 0
