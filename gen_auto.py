@@ -107,37 +107,45 @@ def compare_aalpy_with_random(taille, np, nm, nstate):
     return n / len(l)
 
 def compare_RPNI_NFA(taille, np, nm, states):
-     model_rpni = run_RPNI(p, automaton_type='dfa', print_info=False)
+
+    alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    alpha = alphabet[:taille]
+    p_rpni, m_rpni = gen_words(1,5, np, nm, len(alpha))
+
+    p1 = to_tuple_list(p_rpni, True)
+    m1 = to_tuple_list(m_rpni, False)
+
+    model_rpni = run_RPNI(p1 + m1, automaton_type='dfa', print_info=False)
+    auto_genetic = bundle(nfa.algo_genetiq(p1, m1, 50, 10))
     
     # on teste la qualité de l'automate model_rpni
     # pour cela on génére un seconde échantillon 
-    p, m = gen_words(1,5, np, nm, len(alpha))
-    p1 = []
-    m1 = []
-    for w in p :
-        try:
-            res = random_dfa.compute_output_seq(model_rpni.initial_state, w)
-            if res[-1] : 
-                p1.append(w)
-            else:
-                m1.append(w)
-        except:
-            continue
+    p, _ = gen_words(1,5, np, 0, len(alpha))
+    # p1 = []
+    # m1 = []
+    # for w in p :
+    #     try:
+    #         res = model_rpni.compute_output_seq(model_rpni.initial_state, w)
+    #         if res[-1] : 
+    #             p1.append(w)
+    #         else:
+    #             m1.append(w)
+    #     except:
+    #         continue
          
     n = 0
-    l = p1 + m1
 
-    nfa = 
-    
-    for w in l : 
+    for w in p : 
         try : 
-            res1 = nfa.is_accept(w) 
+            res1 = auto.is_accept(w)
             res2 = model_rpni.compute_output_seq(model_rpni.initial_state, w)
 
-            if ((not res1[-1]) and res2[-1]) or (res1[-1] and (not res2[-1])):
+            if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
                 n += 1
         except Exception:
             continue
+
+    return n / len(p)
 
 
 if __name__ == '__main__':
@@ -148,7 +156,7 @@ if __name__ == '__main__':
     for j in x:
        somme = 0
        for i in range(100):
-            somme += compare_aalpy_with_random(3,100, 0,j)
+            somme += compare_RPNI_NFA(3,100, 0,j)
        print(j," ",somme/100)
        y.append(somme/100)
 
@@ -170,3 +178,7 @@ if __name__ == '__main__':
     ax.plot(x, ymax, color='tab:green', label='sup curve')
     ax.legend()
     plt.show()
+
+
+    # np = ['aa', 'aba', 'bbbb', 'ca', 'cccb']
+    # nm = ['b', 'bba', 'cc', 'a']
