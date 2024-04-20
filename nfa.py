@@ -134,8 +134,8 @@ def string_from_partition(partition):
     return s
 
 def mutation(partition):
-    place = random.randint(0, len(partition))
-    mu = random.randint(0, len(partition))
+    place = random.randint(0, len(partition) - 1)
+    mu = random.randint(0, len(partition) - 1)
     partition = str(partition[:place]) + str(mu) + str(partition[place+1:])
     
     return partition
@@ -163,10 +163,8 @@ def partition_from_string(s):
     return partition
 
 def part_initial_state(partition):
-    print(partition)
     for i, part in enumerate(partition):
         for state in part : 
-            print(state.state_id, "  ", state.initial_state)
             if state.initial_state :
                 return i
     return None
@@ -213,13 +211,11 @@ def nfa_from_partition(partition, all_states):
 
 def number_to_states(partitions, all_states):
     l = []
-    print(partitions)
+
     for p in partitions:
         m = []
         for s in p:
-            print("val", s)
-            for z in all_states:
-                print("id", z.state_id)
+
             [v] = [a for a in all_states if a.state_id == s]
 
             # it = filter(lambda x: (x.state_id == s) ,all_states)
@@ -230,12 +226,11 @@ def number_to_states(partitions, all_states):
     return l
 
 def fitness_function(p, all_states, m):
-    print("string ", p)
+
     p = partition_from_string(p)
-    print("p", p)
     ps = number_to_states(p, all_states)
-    print("ps", ps)
     nfa = nfa_from_partition(ps, all_states)
+
     err = 0
     for s in m : 
         if not nfa.is_accept(s):
@@ -247,7 +242,6 @@ def initial_gen(len_gen, list_states, m):
     l = []
     for _ in range(len_gen):
         p = partition(list(range(len(list_states))))
-        print("part string ", p)
         st = string_from_partition(p)
         l.append((st, fitness_function(st, list_states, m)))
     l = sorted(l, key=lambda x: x[1])
@@ -257,6 +251,11 @@ def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
     len_mut = (cent_mut * len(prev_gen)) // 100
     len_copy = (cent_copy * len(prev_gen)) // 100
     len_cross = ((100 - cent_copy - cent_mut) * len(prev_gen)) // 100
+    if(len_cross % 2 != 0):
+        len_cross -= 1
+        len_copy += 1
+    
+    len_cross //= 2
     
     #
     t = sum(n for _, n in prev_gen)
@@ -275,10 +274,12 @@ def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
 
     #crossover 
     for _ in range(len_cross):
+
         [(c1, _)] = random.choices(prev_gen, weights=a)
         [(c2, _)] = random.choices(prev_gen, weights=a)
-        p = crossover(c1, c2)
-        l.append((p, fitness_function(p, list_states, states_minus)))  
+        b,c = crossover(c1, c2)
+        l.append((b, fitness_function(b, list_states, states_minus))) 
+        l.append((c, fitness_function(c, list_states, states_minus)))
     return l
 
 def best_avg_fitness(g):
@@ -289,16 +290,12 @@ def best_avg_fitness(g):
 def algo_genetiq(p, m, taille_gen, nb_gen):
     nfa, all_states = MCA(p)
 
-    for s in all_states:
-        print(s.state_id)
-
-
     init_gen = initial_gen(taille_gen, all_states, m)
     all = [best_avg_fitness(init_gen)]
     prev_gen = init_gen
     for _ in range(nb_gen):
         n_gen = next_gen(prev_gen, all_states, m)
-        all.append(best_avg_fitness(next_gen))
+        all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
     all = sorted(all, key=lambda x: x[1])
@@ -309,7 +306,27 @@ if __name__ == '__main__':
 
     a = algo_genetiq(['aa', 'aba'], ['b', 'bba'], 50, 10)
 
-    # print(a.is_accept('b'))
+    mca,all_states = MCA(['aa', 'aba'])
+    print(mca.is_accept('b'))
+    print(mca.is_accept('aba'))
+
+    # print(a[len(a)-1][1])
+    print(a[len(a)-1])
+    print("------------------",a[len(a)-1][0][0][0],"--------------------------")
+    p = partition_from_string(a[len(a)-1][0][0][0])
+
+    ps = number_to_states(p,all_states)
+
+    n = nfa_from_partition(ps,all_states)
+
+    # print_auto(n)
+
+    print(a[len(a)-1])
+
+    print(n.is_accept('b'))
+    print(n.is_accept('bba'))
+    print(n.is_accept('aa'))
+    print(n.is_accept('aba'))
 
 
     # s1 = State(1, False, initial_state=True)
