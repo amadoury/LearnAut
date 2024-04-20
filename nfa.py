@@ -163,8 +163,10 @@ def partition_from_string(s):
     return partition
 
 def part_initial_state(partition):
+    print(partition)
     for i, part in enumerate(partition):
         for state in part : 
+            print(state.state_id, "  ", state.initial_state)
             if state.initial_state :
                 return i
     return None
@@ -184,6 +186,7 @@ def which_part(state, all):
 
 def nfa_from_partition(partition, all_states):
     j = part_initial_state(partition)
+    assert(j != None)
     accept = part_contains_accepting(partition[j])
     initial_state = State(partition[j],accept,initial_state=True)
 
@@ -208,35 +211,47 @@ def nfa_from_partition(partition, all_states):
                             all[q].add_transition({k:{all[p]}})
     return Nfa(initial_state)
 
-    
+def number_to_states(partitions, all_states):
+    l = []
+    print(partitions)
+    for p in partitions:
+        m = []
+        for s in p:
+            print("val", s)
+            for z in all_states:
+                print("id", z.state_id)
+            [v] = [a for a in all_states if a.state_id == s]
+
+            # it = filter(lambda x: (x.state_id == s) ,all_states)
+            # if len(list(it)) == 1:
+            #     [v] = list(it)
+            m.append(v)
+        l.append(m)
+    return l
+
 def fitness_function(p, all_states, m):
-    nfa = nfa_from_partition(p, all_states)
+    print("string ", p)
+    p = partition_from_string(p)
+    print("p", p)
+    ps = number_to_states(p, all_states)
+    print("ps", ps)
+    nfa = nfa_from_partition(ps, all_states)
     err = 0
     for s in m : 
         if not nfa.is_accept(s):
             err += 1
     return err + len(all_states)
 
-def number_to_states(partitions, all_states):
-    parti = []
-    for part in partitions:
-        for p in part : 
-            l = []
-            for a in all_states : 
-                if a.state_id == p : 
-                    l.append(a)
-        parti.append(l)
-    return parti
-
 
 def initial_gen(len_gen, list_states, m):
     l = []
     for _ in range(len_gen):
-        p = partition(list_states)
-        l.append((p, fitness_function(p, list_states, m)))
+        p = partition(list(range(len(list_states))))
+        print("part string ", p)
+        st = string_from_partition(p)
+        l.append((st, fitness_function(st, list_states, m)))
     l = sorted(l, key=lambda x: x[1])
     return l
-
 
 def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
     len_mut = (cent_mut * len(prev_gen)) // 100
@@ -256,23 +271,28 @@ def next_gen(prev_gen, list_states, states_minus ,cent_mut=5, cent_copy=5):
     for _ in range(len_mut):
         [(c, _)] = random.choices(prev_gen, weights=a)
         p = mutation(c)
-        l.append(p, fitness_function(p, list_states, states_minus))
+        l.append((p, fitness_function(p, list_states, states_minus)))
 
     #crossover 
     for _ in range(len_cross):
         [(c1, _)] = random.choices(prev_gen, weights=a)
         [(c2, _)] = random.choices(prev_gen, weights=a)
         p = crossover(c1, c2)
-        l.append(p, fitness_function(p, list_states, states_minus))  
+        l.append((p, fitness_function(p, list_states, states_minus)))  
     return l
 
-def best_avg_fitness(gen):
-    _, best_fitness = gen[0]
-    avg_fitness = sum(n for _, n in gen) / len(gen)
-    return gen, best_fitness, avg_fitness
+def best_avg_fitness(g):
+    _, bf = g[0]
+    avgf = sum(n for _, n in g) / len(g)
+    return g, bf, avgf
 
 def algo_genetiq(p, m, taille_gen, nb_gen):
     nfa, all_states = MCA(p)
+
+    for s in all_states:
+        print(s.state_id)
+
+
     init_gen = initial_gen(taille_gen, all_states, m)
     all = [best_avg_fitness(init_gen)]
     prev_gen = init_gen
@@ -289,7 +309,7 @@ if __name__ == '__main__':
 
     a = algo_genetiq(['aa', 'aba'], ['b', 'bba'], 50, 10)
 
-    print(a.is_accept('b'))
+    # print(a.is_accept('b'))
 
 
     # s1 = State(1, False, initial_state=True)
@@ -343,6 +363,9 @@ if __name__ == '__main__':
 
     # p1 = string_from_partition([[1, 2, 6, 7], [3, 9, 10], [4, 5, 8, 11, 12]])
     # p2 = string_from_partition([[1, 3], [2, 7, 9, 10], [4, 8, 12], [5, 6], [11]])
+    # print(p1)
+    # s = partition_from_string(p1)
+    # print(s)
 
     # # print(p1,p2)
     # # p1,p2 = crossover(p1,p2)
@@ -355,3 +378,5 @@ if __name__ == '__main__':
 
     # automata_merged = partition_to_automata(p, auto_states)
     # print_auto(automata_merged)
+
+    
