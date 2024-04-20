@@ -209,8 +209,6 @@ def nfa_from_partition(partition, all_states):
 
 def number_to_states(partitions, all_states):
     l = []
-    print(partitions , "partitions")
-    print(len(all_states), "len all_states")
     for p in partitions:
         m = []
         for s in p:
@@ -309,20 +307,19 @@ if __name__ == '__main__':
 
     a = algo_genetiq(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a'], 50, 10)
 
-    mca,all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
+    _, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
     # print(mca.is_accept('b'))
     # print(mca.is_accept('aba'))
 
     # print(a[len(a)-1][1])
-    print(a[len(a)-1])
-    print("------------------",a[len(a)-1][0][0][0],"--------------------------")
+
     p = partition_from_string(a[len(a)-1][0][0][0])
 
     ps = number_to_states(p,all_states)
 
     n = nfa_from_partition(ps,all_states)
 
-    # print_auto(n)
+    #print(a)
 
     print(a[len(a)-1])
 
