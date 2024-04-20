@@ -98,6 +98,8 @@ def print_auto_state(state, space = "", states_searched = []):
     print(space,end="")
     if state not in states_searched:
         states_searched.append(state)
+    else:
+        return
     for a,b in state.transition.items():
         for s in b:
             print(a,s,end="\n")
