@@ -102,7 +102,7 @@ def print_auto_state(state, space = "", states_searched = []):
         return
     for a,b in state.transition.items():
         for s in b:
-            print(a,s,end="\n")
+            print(a,end="\n")
             print_auto_state(s, space + "   ")
     print("")
 
@@ -308,6 +308,13 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
     all = sorted(all, key=lambda x: x[1])
     return all
 
+def bundle(res_algo_genetic):
+    p = partition_from_string(res_algo_genetic[len(a)-1][0][0][0])
+
+    ps = number_to_states(p,all_states)
+
+    return nfa_from_partition(ps,all_states)
+
 
 if __name__ == '__main__':
 
@@ -326,9 +333,10 @@ if __name__ == '__main__':
 
     n = nfa_from_partition(ps,all_states)
 
-    # print_auto(n)
-
     print(a[len(a)-1])
+
+    print()
+    print_auto(n)
 
     print(n.is_accept('b'))
     print(n.is_accept('bba'))
