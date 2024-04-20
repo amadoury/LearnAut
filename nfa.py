@@ -297,7 +297,7 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
     all = [best_avg_fitness(init_gen)]
     prev_gen = init_gen
     for _ in range(nb_gen):
-        n_gen = next_gen(prev_gen, all_states, m, p)
+        n_gen = next_gen(prev_gen, all_states, m, p, cent_copy=0)
         all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
@@ -307,9 +307,11 @@ def algo_genetiq(p, m, taille_gen, nb_gen):
 
 if __name__ == '__main__':
 
-    a = algo_genetiq(['aa', 'aba'], ['b', 'bba'], 50, 10)
+    a = algo_genetiq(['aa', 'aba', 'bbb', 'c'], ['b', 'bba'], 50, 10)
 
-    mca,all_states = MCA(['aa', 'aba'])
+    print(a)
+
+    mca,all_states = MCA(['aa', 'aba', 'bbb', 'cc'])
     print(mca.is_accept('b'))
     print(mca.is_accept('aba'))
 
