@@ -296,9 +296,6 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
         fb = fitness_function(b, list_states, states_minus, states_plus)
         fc = fitness_function(c, list_states, states_minus, states_plus)
 
-        print("f1:", f1, " f2:", f2)
-        print("fb : ", fc, " fc : ", fc)
-
         l.append((b, fb)) 
         l.append((c, fc))
     return l
@@ -333,36 +330,49 @@ def bundle(res_algo_genetic):
 
 if __name__ == '__main__':
 
-    a = algo_genetiq(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a', 'abb', 'c', 'acc', 'bbb', 'b'], 20, 100)
+    a = algo_genetic(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a', 'abb', 'c', 'acc', 'bbb', 'b'], 20, 100)
 
-    mca,all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
+    n, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
     # print(mca.is_accept('b'))
     # print(mca.is_accept('aba'))
 
     # print(a[len(a)-1][1])
-    print(a[len(a)-1])
-    print("------------------",a[len(a)-1][0][0][0],"--------------------------")
+
+    # print(n.is_accept('b'))
+    # print(n.is_accept('bba'))
+    # print(n.is_accept('cc'))
+    # print(n.is_accept('a'))
+
+    # print(n.is_accept('aa'))
+    # print(n.is_accept('aba'))
+    # print(n.is_accept('bbbb'))
+    # print(n.is_accept('ca'))
+    # print(n.is_accept('cccb'))
+
+
+    print("-----------------------------------")
+
     p = partition_from_string(a[len(a)-1][0][0][0])
 
     ps = number_to_states(p,all_states)
 
     n = nfa_from_partition(ps,all_states)
+ 
+    #print_auto(n)
 
-    print(a[len(a)-1])
+    for i in range(len(a)):
+        print(a[i][1], "---", a[i][2])
 
-    print()
-    print_auto(n)
+    # print(n.is_accept('b'))
+    # print(n.is_accept('bba'))
+    # print(n.is_accept('cc'))
+    # print(n.is_accept('a'))
 
-    print(n.is_accept('b'))
-    print(n.is_accept('bba'))
-    print(n.is_accept('cc'))
-    print(n.is_accept('a'))
-
-    print(n.is_accept('aa'))
-    print(n.is_accept('aba'))
-    print(n.is_accept('bbbb'))
-    print(n.is_accept('ca'))
-    print(n.is_accept('cccb'))
+    # print(n.is_accept('aa'))
+    # print(n.is_accept('aba'))
+    # print(n.is_accept('bbbb'))
+    # print(n.is_accept('ca'))
+    # print(n.is_accept('cccb'))
 
 
     # s1 = State(1, False, initial_state=True)
