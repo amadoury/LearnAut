@@ -62,8 +62,6 @@ if __name__ == '__main__' :
     automata_java = FileHandler.load_automaton_from_file('fic.txt',automaton_type='dfa')
     automata_py = run_RPNI(data, automaton_type='dfa',algorithm='classic')
 
-    ModelChecking.compare_automata(automata_py, automata_java, n)
-    for i in range(n):
         
 
     
