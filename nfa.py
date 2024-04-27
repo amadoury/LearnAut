@@ -231,7 +231,6 @@ def fitness_function(p, all_states, m, plus):
     ps = number_to_states(p, all_states)
     nfa = nfa_from_partition(ps, all_states)
 
-
     err = 0
 
     for s in plus : 
@@ -249,7 +248,6 @@ def initial_gen(len_gen, list_states, m, plus):
     for _ in range(len_gen):
         p = partition(list(range(len(list_states))))
         st = string_from_partition(p)
-        print(st)
         l.append((st, fitness_function(st, list_states, m, plus)))
     l = sorted(l, key=lambda x: x[1])
     return l
@@ -264,15 +262,8 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
     
     len_cross //= 2
     
-    #
-    # t = sum(n for _, n in prev_gen)
-    # a = []
-    # for _, j in prev_gen:
-    #     a.append(1 - j / t)
-
     a = [(10 ** i) for i in range(len(prev_gen))]
     a.reverse()
-    #print("weights : ", a)
     #copy
     l = prev_gen[:len_copy] 
     
@@ -308,7 +299,6 @@ def algo_genetic(p, m, taille_gen, nb_gen):
 
     init_gen = initial_gen(taille_gen, all_states, m, p)
     all = [best_avg_fitness(init_gen)]
-    print("first gen best fitness :", all[0][1])
     prev_gen = init_gen
     for _ in range(nb_gen):
         n_gen = next_gen(prev_gen, all_states, m, p)
@@ -365,16 +355,16 @@ if __name__ == '__main__':
     # print()
     # print_auto(n)
 
-    # print(n.is_accept('b'))
-    # print(n.is_accept('bba'))
-    # print(n.is_accept('cc'))
-    # print(n.is_accept('a'))
+    print(n.is_accept('b'))
+    print(n.is_accept('bba'))
+    print(n.is_accept('cc'))
+    print(n.is_accept('a'))
 
-    # print(n.is_accept('aa'))
-    # print(n.is_accept('aba'))
-    # print(n.is_accept('bbbb'))
-    # print(n.is_accept('ca'))
-    # print(n.is_accept('cccb'))
+    print(n.is_accept('aa'))
+    print(n.is_accept('aba'))
+    print(n.is_accept('bbbb'))
+    print(n.is_accept('ca'))
+    print(n.is_accept('cccb'))
 
 
     # s1 = State(1, False, initial_state=True)

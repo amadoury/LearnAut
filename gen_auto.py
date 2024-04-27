@@ -103,54 +103,91 @@ def compare_aalpy_with_random(taille, np, nm, nstate):
         except Exception:
             continue
 
-#    print("Taux d'error du rpni ", n / len(l))
+    #print("Taux d'error du rpni ", n / len(l))
     return n / len(l)
 
-def compare_RPNI_NFA(taille, np, nm):
+def compare_RPNI_NFA(taille, np, nm, nstate):
 
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     alpha = alphabet[:taille]
+    
+    random_dfa = generate_random_dfa(alphabet=alpha, num_states=nstate, num_accepting_states=nstate//2+1)
+
     p, m = gen_words(1,5, np, nm, len(alpha))
 
+
+    p1 = []
+    m1 = []
+    for w in p :
+        try:
+            res = random_dfa.compute_output_seq(random_dfa.initial_state, w)
+            if res[-1] : 
+                p1.append(w)
+            else:
+                m1.append(w)
+        except:
+            continue
+
+    p = p1
+    m = m1
     p1 = to_tuple_list(p, True)
     m1 = to_tuple_list(m, False)
 
     model_rpni = run_RPNI(p1 + m1, automaton_type='dfa', print_info=False)
 
     _, all_states = nfa.MCA(p)
-    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, 50, 10), all_states)
+    #print("all states :", all_states)
+    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, 20, 100), all_states)
     
 
     p, m = gen_words(1,5, np, nm, len(alpha))
-         
-    n = 0
-    l = p + m
 
-    for w in l : 
+    # compare random and rpni  
+    n1 = 0
+    l1 = p + m
+    for w in l1 : 
         try : 
-            res1 = auto_genetic.is_accept(w)
+            res1 = random_dfa.compute_output_seq(random_dfa.initial_state, w) 
             res2 = model_rpni.compute_output_seq(model_rpni.initial_state, w)
 
-            if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
-                n += 1
+            if ((not res1[-1]) and res2[-1]) or (res1[-1] and (not res2[-1])):
+                n1 += 1
         except Exception:
             continue
 
-    return n / len(l)
+    # compare random and nfa
+    n2 = 0
+    l2 = p + m
+    for w in l2 : 
+        try : 
+            res1 = auto_genetic.is_accept(w)
+            res2 = random_dfa.compute_output_seq(model_rpni.initial_state, w)
+
+            if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
+                n2 += 1
+        except Exception:
+            continue
+
+    return n1 / len(l1), n2 /len(l2)
 
 
 if __name__ == '__main__':
-    print(compare_RPNI_NFA(3,20, 20))
-    # somme = 0
-    # var = 15
-    # x = range(2,var)
-    # y = []
-    # for j in x:
-    #    somme = 0
-    #    for i in range(5):
-    #         somme += compare_RPNI_NFA(3,20, 10,j)
-    #    print(j," ",somme/100)
-    #    y.append(somme/100)
+    # print(compare_RPNI_NFA(3,20, 20, 5))
+    somme = 0
+    var = 30
+    x = range(2,var)
+    y = []
+    k = range(20)
+    for j in x:
+       somme1, somme2 = 0, 0
+       for i in k:
+            a, b = compare_RPNI_NFA(3,20, 20, j)
+            somme1 += a
+            somme2 += b
+        
+       print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k))
+
+       #y.append(somme/100)
 
     # ymax = []
     # ymin = []
