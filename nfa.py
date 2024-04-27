@@ -434,3 +434,4 @@ if __name__ == '__main__':
     # automata_merged = partition_to_automata(p, auto_states)
     # print_auto(automata_merged)
 
+    
