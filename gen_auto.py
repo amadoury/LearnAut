@@ -116,24 +116,15 @@ def compare_RPNI_NFA(taille, np, nm, states):
     m1 = to_tuple_list(m_rpni, False)
 
     model_rpni = run_RPNI(p1 + m1, automaton_type='dfa', print_info=False)
-    auto_genetic = bundle(nfa.algo_genetiq(p1, m1, 50, 10))
+
+    _, all_states = nfa.MCA(p)
+    auto_genetic = nfa.bundle(nfa.algo_genetiq(p, m, 50, 10), all_states)
     
-    # on teste la qualité de l'automate model_rpni
-    # pour cela on génére un seconde échantillon 
-    p, _ = gen_words(1,5, np, 0, len(alpha))
-    # p1 = []
-    # m1 = []
-    # for w in p :
-    #     try:
-    #         res = model_rpni.compute_output_seq(model_rpni.initial_state, w)
-    #         if res[-1] : 
-    #             p1.append(w)
-    #         else:
-    #             m1.append(w)
-    #     except:
-    #         continue
+
+    p, m = gen_words(1,5, np, nm, len(alpha))
          
     n = 0
+    l = p + m
 
     for w in p : 
         try : 
