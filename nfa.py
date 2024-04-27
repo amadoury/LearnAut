@@ -276,7 +276,7 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
 
     a = [(10 ** i) for i in range(len(prev_gen))]
     a.reverse()
-    print("weights : ", a)
+    #print("weights : ", a)
     #copy
     l = prev_gen[:len_copy] 
     
@@ -291,6 +291,7 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
 
         [(c1, _)] = random.choices(prev_gen, weights=a)
         [(c2, _)] = random.choices(prev_gen, weights=a)
+
         b,c = crossover(c1, c2)
 
         fb = fitness_function(b, list_states, states_minus, states_plus)
