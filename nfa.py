@@ -147,8 +147,8 @@ def crossover(partition_1, partition_2):
     len_1 = len(partition_1)
     len_2 = len(partition_2)
 
-    return (partition_1[:len_1 // 2] + partition_2[len_2 // 2:]
-            , partition_2[:len_2 // 2] + partition_1[len_1 // 2:])
+    return (partition_1[:len_1 // 3] + partition_2[len_2 // 3:]
+            , partition_2[:len_2 // 3] + partition_1[len_1 // 3:])
 
 def partition_from_string(s):
     part = []
@@ -213,8 +213,6 @@ def nfa_from_partition(partition, all_states):
 
 def number_to_states(partitions, all_states):
     l = []
-    print(partitions , "partitions")
-    print(len(all_states), "len all_states")
     for p in partitions:
         m = []
         for s in p:
@@ -233,6 +231,7 @@ def fitness_function(p, all_states, m, plus):
     ps = number_to_states(p, all_states)
     nfa = nfa_from_partition(ps, all_states)
 
+
     err = 0
 
     for s in plus : 
@@ -242,7 +241,7 @@ def fitness_function(p, all_states, m, plus):
     for s in m : 
         if nfa.is_accept(s):
             err += 1
-    return err + len(all_states)
+    return 100*err + len(p)
 
 
 def initial_gen(len_gen, list_states, m, plus):
@@ -271,9 +270,6 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
     # for _, j in prev_gen:
     #     a.append(1 - j / t)
 
-    for _, k in prev_gen:
-        print("prev fitness : ",k)
-
     a = [(10 ** i) for i in range(len(prev_gen))]
     a.reverse()
     #print("weights : ", a)
@@ -299,6 +295,7 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
 
         l.append((b, fb)) 
         l.append((c, fc))
+        l = sorted(l, key=lambda x: x[1])
     return l
 
 def best_avg_fitness(g):
@@ -321,8 +318,9 @@ def algo_genetic(p, m, taille_gen, nb_gen):
     #all = sorted(all, key=lambda x: x[1])
     return all
 
-def bundle(res_algo_genetic):
-    p = partition_from_string(res_algo_genetic[len(a)-1][0][0][0])
+def bundle(res_algo_genetic, all_states):
+
+    p = partition_from_string(res_algo_genetic[len(res_algo_genetic)-1][0][0][0])
 
     ps = number_to_states(p,all_states)
 
@@ -363,6 +361,9 @@ if __name__ == '__main__':
 
     for i in range(len(a)):
         print(a[i][1], "---", a[i][2])
+
+    # print()
+    # print_auto(n)
 
     # print(n.is_accept('b'))
     # print(n.is_accept('bba'))
@@ -443,4 +444,3 @@ if __name__ == '__main__':
     # automata_merged = partition_to_automata(p, auto_states)
     # print_auto(automata_merged)
 
-    

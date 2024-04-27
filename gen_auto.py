@@ -106,19 +106,19 @@ def compare_aalpy_with_random(taille, np, nm, nstate):
 #    print("Taux d'error du rpni ", n / len(l))
     return n / len(l)
 
-def compare_RPNI_NFA(taille, np, nm, states):
+def compare_RPNI_NFA(taille, np, nm):
 
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     alpha = alphabet[:taille]
-    p_rpni, m_rpni = gen_words(1,5, np, nm, len(alpha))
+    p, m = gen_words(1,5, np, nm, len(alpha))
 
-    p1 = to_tuple_list(p_rpni, True)
-    m1 = to_tuple_list(m_rpni, False)
+    p1 = to_tuple_list(p, True)
+    m1 = to_tuple_list(m, False)
 
     model_rpni = run_RPNI(p1 + m1, automaton_type='dfa', print_info=False)
 
     _, all_states = nfa.MCA(p)
-    auto_genetic = nfa.bundle(nfa.algo_genetiq(p, m, 50, 10), all_states)
+    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, 50, 10), all_states)
     
 
     p, m = gen_words(1,5, np, nm, len(alpha))
@@ -126,9 +126,9 @@ def compare_RPNI_NFA(taille, np, nm, states):
     n = 0
     l = p + m
 
-    for w in p : 
+    for w in l : 
         try : 
-            res1 = auto.is_accept(w)
+            res1 = auto_genetic.is_accept(w)
             res2 = model_rpni.compute_output_seq(model_rpni.initial_state, w)
 
             if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
@@ -136,39 +136,40 @@ def compare_RPNI_NFA(taille, np, nm, states):
         except Exception:
             continue
 
-    return n / len(p)
+    return n / len(l)
 
 
 if __name__ == '__main__':
-    somme = 0
-    var = 45
-    x = range(2,var)
-    y = []
-    for j in x:
-       somme = 0
-       for i in range(100):
-            somme += compare_RPNI_NFA(3,100, 0,j)
-       print(j," ",somme/100)
-       y.append(somme/100)
+    print(compare_RPNI_NFA(3,20, 20))
+    # somme = 0
+    # var = 15
+    # x = range(2,var)
+    # y = []
+    # for j in x:
+    #    somme = 0
+    #    for i in range(5):
+    #         somme += compare_RPNI_NFA(3,20, 10,j)
+    #    print(j," ",somme/100)
+    #    y.append(somme/100)
 
-    ymax = []
-    ymin = []
-    for i in range(var-2):
-        ymax.append(max(y[i:]))
-        ymin.append(min(y[i:]))
+    # ymax = []
+    # ymin = []
+    # for i in range(var-2):
+    #     ymax.append(max(y[i:]))
+    #     ymin.append(min(y[i:]))
 
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.set_ylabel("Taux erreur")
-    ax.set_xlabel("nombre d'états")
-    ax.set_title("Evolution moyenne des comparaisons")
+    # fig = plt.figure()
+    # ax = fig.add_subplot(1, 1, 1)
+    # ax.set_ylabel("Taux erreur")
+    # ax.set_xlabel("nombre d'états")
+    # ax.set_title("Evolution moyenne des comparaisons")
        
 
-    ax.plot(x,y, label='curve')
-    ax.plot(x, ymin, color='tab:red', label='inf curve')
-    ax.plot(x, ymax, color='tab:green', label='sup curve')
-    ax.legend()
-    plt.show()
+    # ax.plot(x,y, label='curve')
+    # ax.plot(x, ymin, color='tab:red', label='inf curve')
+    # ax.plot(x, ymax, color='tab:green', label='sup curve')
+    # ax.legend()
+    # plt.show()
 
 
     # np = ['aa', 'aba', 'bbbb', 'ca', 'cccb']
