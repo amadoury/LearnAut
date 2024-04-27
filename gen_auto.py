@@ -118,7 +118,7 @@ def compare_RPNI_NFA(taille, np, nm):
     model_rpni = run_RPNI(p1 + m1, automaton_type='dfa', print_info=False)
 
     _, all_states = nfa.MCA(p)
-    auto_genetic = nfa.bundle(nfa.algo_genetiq(p, m, 50, 10), all_states)
+    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, 50, 10), all_states)
     
 
     p, m = gen_words(1,5, np, nm, len(alpha))

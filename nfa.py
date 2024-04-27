@@ -249,6 +249,7 @@ def initial_gen(len_gen, list_states, m, plus):
     for _ in range(len_gen):
         p = partition(list(range(len(list_states))))
         st = string_from_partition(p)
+        print(st)
         l.append((st, fitness_function(st, list_states, m, plus)))
     l = sorted(l, key=lambda x: x[1])
     return l
@@ -264,11 +265,17 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
     len_cross //= 2
     
     #
-    t = sum(n for _, n in prev_gen)
-    a = []
-    for _, j in prev_gen:
-        a.append(1 - j / t)
+    # t = sum(n for _, n in prev_gen)
+    # a = []
+    # for _, j in prev_gen:
+    #     a.append(1 - j / t)
 
+    for _, k in prev_gen:
+        print("prev fitness : ",k)
+
+    a = [(10 ** i) for i in range(len(prev_gen))]
+    a.reverse()
+    print("weights : ", a)
     #copy
     l = prev_gen[:len_copy] 
     
@@ -289,11 +296,12 @@ def next_gen(prev_gen, list_states, states_minus , states_plus, cent_mut=5, cent
         fb = fitness_function(b, list_states, states_minus, states_plus)
         fc = fitness_function(c, list_states, states_minus, states_plus)
 
-        print("f1:", f1, " f2:", f2)
-        print("fb : ", fc, " fc : ", fc)
+        # print("f1:", f1, " f2:", f2)
+        # print("fb : ", fc, " fc : ", fc)
 
         l.append((b, fb)) 
         l.append((c, fc))
+        l = sorted(l, key=lambda x: x[1])
     return l
 
 def best_avg_fitness(g):
@@ -301,18 +309,19 @@ def best_avg_fitness(g):
     avgf = sum(n for _, n in g) / len(g)
     return g, bf, avgf
 
-def algo_genetiq(p, m, taille_gen, nb_gen):
+def algo_genetic(p, m, taille_gen, nb_gen):
     nfa, all_states = MCA(p)
 
     init_gen = initial_gen(taille_gen, all_states, m, p)
     all = [best_avg_fitness(init_gen)]
+    print("first gen best fitness :", all[0][1])
     prev_gen = init_gen
     for _ in range(nb_gen):
         n_gen = next_gen(prev_gen, all_states, m, p)
         all.append(best_avg_fitness(n_gen))
         prev_gen = n_gen
 
-    all = sorted(all, key=lambda x: x[1])
+    #all = sorted(all, key=lambda x: x[1])
     return all
 
 def bundle(res_algo_genetic, all_states):
@@ -326,7 +335,7 @@ def bundle(res_algo_genetic, all_states):
 
 if __name__ == '__main__':
 
-    a = algo_genetiq(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a', 'abb', 'c', 'acc', 'bbb', 'b'], 20, 100)
+    a = algo_genetic(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a', 'abb', 'c', 'acc', 'bbb', 'b'], 20, 100)
 
     n, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])
     # print(mca.is_accept('b'))
