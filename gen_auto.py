@@ -176,7 +176,8 @@ if __name__ == '__main__':
     somme = 0
     var = 30
     x = range(2,var)
-    y = []
+    y1 = []
+    y2 = []
     k = range(20)
     for j in x:
        somme1, somme2 = 0, 0
@@ -187,26 +188,36 @@ if __name__ == '__main__':
         
        print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k))
 
-       #y.append(somme/100)
+       y1.append(somme1/100)
+       y2.append(somme2/100)
 
-    # ymax = []
-    # ymin = []
-    # for i in range(var-2):
-    #     ymax.append(max(y[i:]))
-    #     ymin.append(min(y[i:]))
+    ymax_RPNI = []
+    ymin_RPNI = []
+    for i in range(var-2):
+        ymax_RPNI.append(max(y1[i:]))
+        ymin_RPNI.append(min(y1[i:]))
 
-    # fig = plt.figure()
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.set_ylabel("Taux erreur")
-    # ax.set_xlabel("nombre d'états")
-    # ax.set_title("Evolution moyenne des comparaisons")
+    ymax_genetic = []
+    ymin_genetic = []
+    for i in range(var-2):
+        ymax_genetic.append(max(y2[i:]))
+        ymin_genetic.append(min(y2[i:]))
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_ylabel("Taux erreur")
+    ax.set_xlabel("nombre d'états")
+    ax.set_title("Evolution moyenne des comparaisons")
        
 
-    # ax.plot(x,y, label='curve')
-    # ax.plot(x, ymin, color='tab:red', label='inf curve')
-    # ax.plot(x, ymax, color='tab:green', label='sup curve')
-    # ax.legend()
-    # plt.show()
+    ax.plot(x,y1, label='curve RPNI')
+    ax.plot(x,y2, label='curve genetic')
+    ax.plot(x, ymin_RPNI, color='tab:red', label='inf curve RPNI')
+    ax.plot(x, ymax_RPNI, color='tab:green', label='sup curve RPNI')
+    ax.plot(x, ymin_genetic, color='tab:red', label='inf curve genetic')
+    ax.plot(x, ymax_genetic, color='tab:green', label='sup curve genetic')
+    ax.legend()
+    plt.show()
 
 
     # np = ['aa', 'aba', 'bbbb', 'ca', 'cccb']
