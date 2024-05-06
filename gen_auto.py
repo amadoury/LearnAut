@@ -111,7 +111,7 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     alpha = alphabet[:taille]
     
-    random_dfa = generate_random_dfa(alphabet=alpha, num_states=nstate, num_accepting_states=nstate//2+1)
+    random_dfa = generate_random_dfa(alphabet=alpha, num_states=nstate, num_accepting_states=nstate//2)
 
     p, m = gen_words(1,5, np, nm, len(alpha))
 
@@ -156,40 +156,83 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
             continue
 
     # compare random and nfa
+
+    reject_all = generate_random_dfa(alphabet=alpha, num_states=1, num_accepting_states=0)
+
+
     n2 = 0
+    n3 = 0
     l2 = p + m
     for w in l2 : 
         try : 
             res1 = auto_genetic.is_accept(w)
-            res2 = random_dfa.compute_output_seq(model_rpni.initial_state, w)
+            res2 = random_dfa.compute_output_seq(random_dfa.initial_state, w)
+            res3 = reject_all.compute_output_seq(reject_all.initial_state, w)
 
             if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
                 n2 += 1
+            if ((not res1) and res3[-1]) or (res1 and (not res3[-1])):
+                n3 += 1
         except Exception:
             continue
 
-    return n1 / len(l1), n2 /len(l2)
+    return n1 / len(l1), n2 /len(l2), n3 /len(l2)
 
+
+    # n2 = 0
+    # l2 = p + m
+    # for w in l2 : 
+    #     try : 
+    #         res1 = auto_genetic.is_accept(w)
+    #         res2 = random_dfa.compute_output_seq(model_rpni.initial_state, w)
+
+    #         if ((not res1) and res2[-1]) or (res1 and (not res2[-1])):
+    #             n2 += 1
+    #     except Exception:
+    #         continue
+
+    # return n1 / len(l1), n2 /len(l2)
+
+# pour un nombre d'états donné 
+# une figure pour montrer que si le nombre d'états augments le nombre d'erreurs augmente
+
+#rapport 
+# 1 - expliquer le probleme : apprentissage d'automates à partir de mots 
+# expliquer le rpni
+# aussi l'alog génétique
+# avec exemples 
+#comparaison du nombre d'erreurs en fonctions de la mutation et le crossover utilisés
+
+# 3 taches
+# 1 rapport
+# finaliser
+# presenter
+
+#pour mardi prochain
+# le plan du rapport pour mardi
+
+# ajouter 2 automates : comparer l'automates qui accepte tout oubien qui rejette tout avec genetic
 
 if __name__ == '__main__':
     # print(compare_RPNI_NFA(3,20, 20, 5))
     somme = 0
-    var = 30
+    var = 10
     x = range(2,var)
     y1 = []
     y2 = []
     k = range(20)
     for j in x:
-       somme1, somme2 = 0, 0
+       somme1, somme2, somme3 = 0, 0, 0
        for i in k:
-            a, b = compare_RPNI_NFA(3,20, 20, j)
+            a, b, c = compare_RPNI_NFA(7,50, 50, j)
             somme1 += a
             somme2 += b
+            somme3 += c
         
-       print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k))
+       print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k), "| 3em ",somme3/len(k))
 
-       y1.append(somme1/100)
-       y2.append(somme2/100)
+       y1.append(somme1/len(k))
+       y2.append(somme2/len(k))
 
     ymax_RPNI = []
     ymin_RPNI = []
