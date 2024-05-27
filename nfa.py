@@ -319,7 +319,6 @@ def bundle(res_algo_genetic, all_states):
 
 if __name__ == '__main__':
 
-
     a = algo_genetic(['aa', 'aba', 'bbbb', 'ca', 'cccb'], ['b', 'bba', 'cc', 'a', 'abb', 'c', 'acc', 'bbb', 'b'], 20, 100)
 
     n, all_states = MCA(['aa', 'aba', 'bbbb', 'ca', 'cccb'])

@@ -106,7 +106,7 @@ def compare_aalpy_with_random(taille, np, nm, nstate):
     #print("Taux d'error du rpni ", n / len(l))
     return n / len(l)
 
-def compare_RPNI_NFA(taille, np, nm, nstate):
+def compare_RPNI_NFA(taille, np, nm, nstate, taille_generation):
 
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     alpha = alphabet[:taille]
@@ -137,7 +137,7 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
 
     _, all_states = nfa.MCA(p)
     #print("all states :", all_states)
-    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, 20, 100), all_states)
+    auto_genetic = nfa.bundle(nfa.algo_genetic(p, m, taille_generation, 100), all_states)
     
 
     p, m = gen_words(1,5, np, nm, len(alpha))
@@ -158,7 +158,6 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
     # compare random and nfa
 
     reject_all = generate_random_dfa(alphabet=alpha, num_states=1, num_accepting_states=0)
-
 
     n2 = 0
     n3 = 0
@@ -203,6 +202,9 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
 # avec exemples 
 #comparaison du nombre d'erreurs en fonctions de la mutation et le crossover utilisés
 
+# Plan du rapport
+# 1 - Introduction
+
 # 3 taches
 # 1 rapport
 # finaliser
@@ -215,24 +217,47 @@ def compare_RPNI_NFA(taille, np, nm, nstate):
 
 if __name__ == '__main__':
     # print(compare_RPNI_NFA(3,20, 20, 5))
-    somme = 0
+    # somme = 0
+    # var = 10
+    # x = range(2,var)
+    # y1 = []
+    # y2 = []
+    # k = range(20)
+    # for j in x:
+    #    somme1, somme2, somme3 = 0, 0, 0
+    #    for i in k:
+    #         a, b, c = compare_RPNI_NFA(7,50, 50, j)
+    #         somme1 += a
+    #         somme2 += b
+    #         somme3 += c
+        
+    #    print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k), "| 3em ",somme3/len(k))
+
+    #    y1.append(somme1/len(k))
+    #    y2.append(somme2/len(k))
     var = 10
     x = range(2,var)
     y1 = []
     y2 = []
     k = range(20)
+    taille_generation = 50
     for j in x:
-       somme1, somme2, somme3 = 0, 0, 0
-       for i in k:
-            a, b, c = compare_RPNI_NFA(7,50, 50, j)
-            somme1 += a
-            somme2 += b
-            somme3 += c
-        
-       print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k), "| 3em ",somme3/len(k))
+       
+       for av in range(1,4):
+        somme1, somme2, somme3 = 0, 0, 0
+        print("----taille generation",taille_generation, "----")
+        for i in k:
+                a, b, c = compare_RPNI_NFA(7,50, 50, j, av*taille_generation)
+                somme1 += a
+                somme2 += b
+                somme3 += c
+            
+        print(j,"taux rpni ", somme1/len(k), "| taux genetic : ", somme2/len(k), "| 3em ",somme3/len(k))
 
-       y1.append(somme1/len(k))
-       y2.append(somme2/len(k))
+        y1.append(somme1/len(k))
+        y2.append(somme2/len(k))
+
+
 
     ymax_RPNI = []
     ymin_RPNI = []
